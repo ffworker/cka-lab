@@ -2,7 +2,7 @@
 
 ## Start of every lab session
 
-1. Open `../cka-shared/handoff.json`
+1. Open `cka-shared/handoff.json`
 2. Read:
    - `theoryStatus.weakTopics`
    - `theoryStatus.unstableConcepts`
@@ -12,7 +12,7 @@
 
 ## End of every lab session
 
-Update `practicalFeedback` in `../cka-shared/handoff.json`:
+Update `practicalFeedback` in `cka-shared/handoff.json`:
 - `recentPracticeFindings`
 - `successfulTasks`
 - `theoryFollowupNeeded`

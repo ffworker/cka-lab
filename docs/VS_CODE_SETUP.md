@@ -8,12 +8,12 @@ Use this repo as the practical IDE workspace tied to GitHub.
 
 - open `cka-lab` as the VS Code folder
 - connect it to its own GitHub repo
-- keep `cka-shared` cloned next to it or as a sibling directory
+- initialize the `cka-shared` git submodule after cloning
 - use chat inside the IDE for practical tasks only
 
 ## Important
 
-The IDE agent should read `../cka-shared/handoff.json` before suggesting drills.
+The IDE agent should read `cka-shared/handoff.json` before suggesting drills.
 
 ## Good prompts in the IDE
 

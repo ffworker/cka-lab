@@ -14,10 +14,10 @@ Use this repo for:
 ## Connected shared state
 
 Read from:
-- `../cka-shared/handoff.json`
+- `cka-shared/handoff.json` via the git submodule
 
 Write back to:
-- `../cka-shared/handoff.json` under `practicalFeedback`
+- `cka-shared/handoff.json` under `practicalFeedback`
 
 ## Important rule
 

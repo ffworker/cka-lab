@@ -36,3 +36,10 @@ Do not practice topics listed in `notYetIntroduced`.
 
 This repo should never invent practical work in isolation.
 It should derive work from the theory state produced in `cka-qa` and stored in `cka-shared`.
+
+## AI agents
+
+Any future AI agent working in this repo must read:
+- `AI-WORKFLOW.md`
+- `AGENTS.md`
+- `cka-shared/handoff.json`

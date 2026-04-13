@@ -1,0 +1,11 @@
+{
+  "recentPracticeFindings": [
+    "example: forgot endpoints check before checking targetPort"
+  ],
+  "successfulTasks": [
+    "example: correctly traced Deployment to ReplicaSet to Pod"
+  ],
+  "theoryFollowupNeeded": [
+    "example: scheduler vs kubelet"
+  ]
+}

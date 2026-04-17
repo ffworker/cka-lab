@@ -32,6 +32,12 @@ Do not practice topics listed in `notYetIntroduced`.
 5. Commit `cka-shared` if shared data changed
 6. Commit the updated submodule pointer in `cka-lab`
 
+## Guided practice in VS Code
+
+Use:
+- `docs/VS_CODE_SETUP.md` for coaching-mode prompt pattern
+- `exercises/vscode-guided-practices.md` for checkpoint-based drills mapped to `handoff.json`
+
 ## System role
 
 This repo should never invent practical work in isolation.

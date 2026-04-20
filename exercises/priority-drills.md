@@ -10,6 +10,10 @@ Generated from `cka-shared/handoff.json`.
 5. compare static Pods vs DaemonSets
 6. compare multiple schedulers vs scheduler profiles
 7. contrast admission controllers with normal controllers
+8. practice rolling updates and watch available replica behavior
+9. compare multi-container Pods with init containers
+10. compare manual scaling, HPA, and VPA
+11. compare etcd snapshot restore with YAML-only restore
 
 ## Ready for practical work
 - Pods
@@ -22,7 +26,19 @@ Generated from `cka-shared/handoff.json`.
 - Resource Limits
 - Priority Classes
 - Admission Controllers basics
+- Commands and Arguments
+- Environment Variables
+- Secrets
+- Multi-Container Pods
+- Init Containers
+- Manual Scaling
+- HPA
+- VPA
+- Logging
+- Monitoring
+- Backup and Restore
+- etcd Backup
 
 ## Constraint
 Do not build drills for topics listed under `notYetIntroduced` in the shared handoff.
-Current examples not yet introduced include Logging, Jobs, CronJobs, Taints and Tolerations, Affinity / Anti-Affinity, RBAC, Ingress, and Network Policies.
+Current examples not yet introduced include Jobs, CronJobs, Taints and Tolerations, Affinity / Anti-Affinity, Ingress, Network Policies, OS Upgrades, Authentication, TLS, Certificates, and Security Contexts.

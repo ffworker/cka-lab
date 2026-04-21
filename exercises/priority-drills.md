@@ -14,6 +14,8 @@ Generated from `cka-shared/handoff.json`.
 9. compare multi-container Pods with init containers
 10. compare manual scaling, HPA, and VPA
 11. compare etcd snapshot restore with YAML-only restore
+12. compare kubeconfig, RBAC, ServiceAccounts, and authentication flow
+13. compare certificate, private key, and CA trust roles
 
 ## Ready for practical work
 - Pods
@@ -38,7 +40,13 @@ Generated from `cka-shared/handoff.json`.
 - Monitoring
 - Backup and Restore
 - etcd Backup
+- kubeconfig
+- RBAC
+- ServiceAccounts
+- TLS
+- ClusterRoles
+- OS Upgrades
 
 ## Constraint
 Do not build drills for topics listed under `notYetIntroduced` in the shared handoff.
-Current examples not yet introduced include Jobs, CronJobs, Taints and Tolerations, Affinity / Anti-Affinity, Ingress, Network Policies, OS Upgrades, Authentication, TLS, Certificates, and Security Contexts.
+Current examples not yet introduced include Jobs, CronJobs, Taints and Tolerations, Affinity / Anti-Affinity, Ingress, Network Policies, Security Contexts, Authentication deeper internals, and Certificate API details.

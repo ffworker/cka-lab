@@ -17,6 +17,7 @@ If you are the AI working in `cka-lab`, your job is to:
 - build practical work from weak topics and unstable concepts
 - avoid getting ahead of theory
 - record practical findings back into the shared handoff
+- prefer build/break/fix drills over passive explanation
 
 ## You must read first
 
@@ -60,11 +61,13 @@ After practical work, write back things like:
 - recurring mistakes
 - what drills succeeded
 - what theory needs reinforcement
+- which link was broken and which command proved it
 
 Examples:
 - forgot to inspect endpoints before checking targetPort
 - still mixes scheduler and kubelet in explanations
 - correctly traced Deployment to ReplicaSet to Pod
+- confused the ingress controller NodePort with the backend application Service
 
 ## Submodule rule
 

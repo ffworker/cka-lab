@@ -1,0 +1,15 @@
+[submodule "cka/source-snapshots/cka-lab"]
+	path = cka/source-snapshots/cka-lab
+	url = https://github.com/ffworker/cka-lab.git
+[submodule "cka/source-snapshots/cka-lab-notes"]
+	path = cka/source-snapshots/cka-lab-notes
+	url = https://github.com/ffworker/cka-lab-notes.git
+[submodule "cka/source-snapshots/cka-qa"]
+	path = cka/source-snapshots/cka-qa
+	url = https://github.com/ffworker/cka-qa.git
+[submodule "cka/source-snapshots/cka-shared"]
+	path = cka/source-snapshots/cka-shared
+	url = https://github.com/ffworker/cka-shared.git
+[submodule "cka/source-snapshots/course-notes"]
+	path = cka/source-snapshots/course-notes
+	url = https://github.com/ffworker/certified-kubernetes-administrator-course.git

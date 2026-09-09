@@ -1,0 +1,5 @@
+# Set the default namespace for kubectl commands to "DEFAULT"
+kubectl config set-context --current --namespace=DEFAULT
+
+# set an alias for kubectl to k for easier use
+alias k=kubectl 

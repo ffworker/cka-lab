@@ -1,1 +1,0 @@
-Active CKA work moved to `ffworker/learning-lab/cka/`. This repository is retained only as a pinned source snapshot.

@@ -1,0 +1,66 @@
+# Exam-effective flow
+
+Usually:
+1. kubectl describe deployment <name>
+2. kubectl get rs,pods
+3. kubectl describe pod <pod>
+4. kubectl logs <pod>
+
+# kubeadm init bootstraps the control plane.
+
+Typical follow-up steps:
+- configure kubeconfig
+- install a CNI plugin
+- join worker nodes with kubeadm join
+
+# A DNS lookup from one Pod to another Service name fails.
+
+If service-name DNS fails, the first high-value checks are:
+- CoreDNS Pods running?
+- CoreDNS Service present?
+- kube-system health
+- Pod /etc/resolv.conf
+- Service and endpoints
+
+Exam-effective flow
+
+Often:
+
+```bash
+  kubectl get pods -n kube-system
+  kubectl get svc -n kube-system
+  kubectl describe pod <coredns-pod> -n kube-system
+```
+
+# Network Policy
+
+A NetworkPolicy controls which traffic is allowed:
+- ingress to Pods
+- egress from Pods
+
+Usually based on:
+- Pod selectors
+- namespace selectors
+- ports
+
+Exam trap
+
+A NetworkPolicy only works if the CNI supports it.
+
+# Service
+
+kubectl get endpoints <service-name> tells you whether the Service has actual backend IPs.
+
+If endpoints are empty, common causes are:
+- selector mismatch
+- Pods not ready
+- wrong labels
+- wrong namespace
+
+Exam shortcut
+
+When a Service exists but traffic fails, check:
+1. Service
+2. Endpoints
+3. Pod labels
+4. Pod readiness

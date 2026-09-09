@@ -1,0 +1,44 @@
+**TROUBLESHOOT LINK** https://kubernetes.io/docs/tasks/debug/debug-cluster/
+
+** QUICK TIP: this is the path where the kubernetes-native pod definitions stored**
+**`/etc/kubernetes/manifests`**
+
+**1. get nodes**
+
+**2. get pods -n kube-system**
+
+**3. check controlplane services** 
+
+```bash
+service kube-apiserver status
+```
+
+**-> look for services and then look at the services ->**
+z.B.
+
+```bash
+service kube-controller-manager status
+```
+
+```bash
+service kube-scheduler status
+```
+
+```bash
+service kubelet status
+```
+
+```bash
+service kube-proxy status
+```
+
+
+**4. Check Logs**
+
+```bash
+kubectl logs kube-apiserver-master -n kube-system
+```
+
+```bash
+sudo journalctl -u kube-apiserver
+```

@@ -1,0 +1,3 @@
+[submodule "cka-shared"]
+	path = cka-shared
+	url = https://github.com/ffworker/cka-shared.git

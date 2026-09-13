@@ -2,7 +2,7 @@
 
 ## Role
 
-This repo is the strict theory lab for CKA.
+This directory is the strict theory and recall area for CKA.
 
 Priorities:
 1. exact definitions
@@ -18,25 +18,26 @@ Priorities:
 - topic updates
 - study status
 - recording quiz findings
-- writing to `cka-shared/handoff.json`
+- writing theory state to `docs/cka-shared/handoff.json`
 
 ## System awareness
 
-This repo is part of a 3-repo workflow:
-- `cka-qa` owns theory tracking
-- `cka-lab` owns practical execution feedback
-- `cka-shared` is the contract bridge
+This directory is part of the self-contained `cka-lab` repository. Theory and
+recall live in `qa/`; practical training lives in `labs/`, `exercises/`, and
+future `scenarios/` and `trainer/`; the learning-state contract lives at
+`docs/cka-shared/handoff.json`.
 
-When theory findings change, update `cka-shared/handoff.json` so the practical lab can target the right drills.
+When theory findings change, update the internal handoff so practical training
+can target the right drills.
 
 ## Ownership rules
 
-This repo may update:
+Theory work may update:
 - `theoryStatus`
 - `practicalFocus`
 - `lastUpdated`
 
-This repo must not overwrite:
+Theory work must not overwrite:
 - `practicalFeedback`
 
 ## Avoid

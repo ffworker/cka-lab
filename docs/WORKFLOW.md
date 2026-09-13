@@ -2,12 +2,16 @@
 
 ## Start of every lab session
 
-1. Open `cka-shared/handoff.json`
+1. Open `docs/cka-shared/handoff.json`
 2. Read:
    - `theoryStatus.weakTopics`
+   - `theoryStatus.improvingTopics`
+   - `theoryStatus.stableTopics` for Wiederholung
    - `theoryStatus.unstableConcepts`
    - `practicalFocus.recommendedDrills`
+   - `practicalFocus.readyForPractice`
    - `practicalFocus.notYetIntroduced`
+   - `practicalFeedback`
 3. Choose only a drill that fits already introduced theory
 
 ## Drill shape
@@ -30,7 +34,8 @@ Ingress controller exposure -> Ingress rule -> Service -> Endpoints -> Pods
 
 ## End of every lab session
 
-Update `practicalFeedback` in `cka-shared/handoff.json`:
+Update only `practicalFeedback` and `lastUpdated` in
+`docs/cka-shared/handoff.json`:
 - `recentPracticeFindings`
 - `successfulTasks`
 - `theoryFollowupNeeded`

@@ -1,6 +1,6 @@
 # QA to Shared Handoff Rules
 
-Update `cka-shared/handoff.json` whenever one of these changes:
+Update `docs/cka-shared/handoff.json` whenever one of these changes:
 - weak topics
 - improving topics
 - stable topics

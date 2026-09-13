@@ -1,4 +1,4 @@
-# cka-qa
+# CKA theory and recall
 
 ## Kubernetes learning map
 
@@ -81,7 +81,7 @@ Theory and recall workspace for CKA preparation.
 
 ## Purpose
 
-Use this repo for:
+Use this directory for:
 - quizzes
 - repetition
 - weak-topic tracking
@@ -89,8 +89,9 @@ Use this repo for:
 - mental models
 - progress tracking
 
-Do not use this repo for noisy manifest experiments. Do use it to turn every
-introduced concept into a practical build/break recommendation for `cka-lab`.
+Do not use this directory for noisy manifest experiments. Do use it to turn
+every introduced concept into a practical build/break recommendation for the
+practical areas in this repository.
 
 ## Current study mode
 
@@ -107,10 +108,9 @@ The goal is CKA exam readiness first. Vendor-specific tools, shortcuts, and
 personal experiments are separate from the main study path unless explicitly
 chosen.
 
-## Connected repo
+## Internal handoff
 
-This repo writes handoff data to:
-- `cka-shared/handoff.json` via the git submodule
+Theory state is written to `docs/cka-shared/handoff.json` in this repository.
 
 ## Core commands in chat
 
@@ -121,25 +121,27 @@ This repo writes handoff data to:
 
 ## Source of learning truth
 
-This repo is the source of truth for:
+The `qa/` area is the source of truth for:
 - weak topics
 - improving topics
 - stable topics
 - unstable concepts
 - practical recommendations
 
-## Workflow in the larger system
+## Workflow
 
-1. theory work happens here
-2. results are written into `cka-shared/handoff.json`
-3. `cka-lab` reads those results and builds practical work from them
-4. practical findings come back through `practicalFeedback`
+1. theory and recall work happens in `qa/`
+2. results are written into `docs/cka-shared/handoff.json`
+3. practical work in this repository derives from those results
+4. practical findings return through `practicalFeedback`
 
 If theory changes but the shared handoff is not updated, the lab will drift.
 
 ## AI agents
 
-Any future AI agent working in this repo must read:
-- `AI-WORKFLOW.md`
-- `AGENTS.md`
-- `cka-shared/handoff.json`
+Any future AI agent working in `qa/` must read:
+- repository-root `AI-WORKFLOW.md`
+- repository-root `AGENTS.md`
+- `qa/AI-WORKFLOW.md`
+- `qa/AGENTS.md`
+- `docs/cka-shared/handoff.json`

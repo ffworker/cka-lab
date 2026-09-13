@@ -4,16 +4,16 @@
 
 This file is for any AI agent working inside `cka-lab`.
 
-This repo is not standalone.
-It is one part of a 3-repo CKA learning system:
-- `cka-qa` for theory, quizzes, repetition, and tracked weak points
-- `cka-lab` for practical labs and IDE-based hands-on work
-- `cka-shared` for the shared handoff contract
+This repository is the standalone CKA learning system. Theory and recall live
+in `qa/`; practical work lives in `labs/`, `exercises/`, `scenarios/`, and
+`trainer/`; the machine-readable contract is
+`docs/cka-shared/handoff.json`. No external learning repository or submodule
+is required.
 
 ## Your role in this repo
 
 If you are the AI working in `cka-lab`, your job is to:
-- read the current theory state from `cka-shared/handoff.json`
+- read the current theory state from `docs/cka-shared/handoff.json`
 - build practical work from weak topics and unstable concepts
 - avoid getting ahead of theory
 - record practical findings back into the shared handoff
@@ -25,7 +25,7 @@ Before proposing exercises or editing lab files, read:
 - `AGENTS.md`
 - `README.md`
 - `docs/WORKFLOW.md`
-- `cka-shared/handoff.json`
+- `docs/cka-shared/handoff.json`
 
 ## Ownership rules
 
@@ -44,9 +44,13 @@ Do not invent practical work in isolation.
 
 Priority sources are:
 - `theoryStatus.weakTopics`
+- `theoryStatus.improvingTopics`
+- `theoryStatus.stableTopics` for spaced revision
 - `theoryStatus.unstableConcepts`
 - `practicalFocus.recommendedDrills`
+- `practicalFocus.readyForPractice`
 - `practicalFocus.notYetIntroduced`
+- `practicalFeedback`
 
 ## Do not do these things
 
@@ -69,11 +73,8 @@ Examples:
 - correctly traced Deployment to ReplicaSet to Pod
 - confused the ingress controller NodePort with the backend application Service
 
-## Submodule rule
+## Repository rule
 
-`cka-shared` is a git submodule.
-If you change `cka-shared/handoff.json`:
-1. commit and push in `cka-shared`
-2. then commit the updated submodule pointer in `cka-lab`
-
-If you skip step 2, `cka-lab` still points to the old shared state.
+Changes to theory, practical feedback, automation, and the handoff contract are
+committed once in this repository. Never instruct the learner to commit or push
+a separate `cka-qa` or `cka-shared` repository.

@@ -7,7 +7,7 @@ This practice pack is derived from:
 - `practicalFocus.recommendedDrills`
 - `practicalFocus.notYetIntroduced`
 
-Source file: `cka-shared/handoff.json`.
+Source file: `docs/cka-shared/handoff.json`.
 
 ---
 

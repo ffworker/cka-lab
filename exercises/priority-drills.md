@@ -1,6 +1,6 @@
 # Priority Drills
 
-Generated from `cka-shared/handoff.json`.
+Generated from `docs/cka-shared/handoff.json`.
 
 ## Current top drills
 1. trace Deployment -> ReplicaSet -> Pods

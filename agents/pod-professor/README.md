@@ -23,5 +23,6 @@ From the repository root:
 Each installation receives private memory, sessions, credentials, and runtime state under that user's Hermes profile directory. Repository learning state remains authoritative. Local trainer XP and mission history remain under ignored `.cka-factory/`.
 
 Pod-Professor consumes the disposable cluster through `make lab-up`,
-`make lab-down`, trainer commands, and kubectl. Factory repair and direct proxmox.example
-work belong to the main infrastructure agent, not the tutor session.
+`make lab-down`, trainer commands, and kubectl. Factory repair and direct
+Proxmox-host work belong to the main infrastructure agent, not the tutor
+session.

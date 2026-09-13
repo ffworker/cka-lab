@@ -1,1 +1,1 @@
-"""Local CLI for the CKA Training Factory skeleton."""
+"""Local CLI for the CKA training mission runner."""

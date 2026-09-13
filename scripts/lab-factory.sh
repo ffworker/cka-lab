@@ -159,6 +159,7 @@ case "$ACTION" in
 
     cp_ip=$(terraform -chdir="$TF_DIR" output -json nodes | python3 -c 'import json,sys; print(json.load(sys.stdin)["control_plane"]["ip_address"].split("/")[0])')
     worker_ip=$(terraform -chdir="$TF_DIR" output -json nodes | python3 -c 'import json,sys; print(json.load(sys.stdin)["worker"]["ip_address"].split("/")[0])')
+    admin_username=$(terraform -chdir="$TF_DIR" output -raw admin_username)
     : >"$KNOWN_HOSTS"
     chmod 600 "$KNOWN_HOSTS"
     record_guest_host_key 110 "$cp_ip"
@@ -169,7 +170,7 @@ case "$ACTION" in
       for _ in $(seq 1 60); do
         if ssh -o BatchMode=yes -o ConnectTimeout=5 -o ProxyJump=proxmox \
           -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$KNOWN_HOSTS" \
-          "cka@$ip" true >/dev/null 2>&1; then
+          "${admin_username}@$ip" true >/dev/null 2>&1; then
           ready=true
           break
         fi
@@ -179,7 +180,7 @@ case "$ACTION" in
       set +e
       ssh -o BatchMode=yes -o ProxyJump=proxmox \
         -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$KNOWN_HOSTS" \
-        "cka@$ip" sudo cloud-init status --wait >/dev/null
+        "${admin_username}@$ip" sudo cloud-init status --wait >/dev/null
       cloud_init_rc=$?
       set -e
       [[ "$cloud_init_rc" -le 2 ]] || fail "cloud-init failed on $ip (status $cloud_init_rc)"
@@ -197,7 +198,7 @@ all:
         cka-worker01:
           ansible_host: $worker_ip
   vars:
-    ansible_user: cka
+    ansible_user: '$admin_username'
     ansible_become: true
     ansible_ssh_common_args: '-o ProxyJump=proxmox -o UserKnownHostsFile=$KNOWN_HOSTS -o StrictHostKeyChecking=yes'
     kubernetes_version: v1.37

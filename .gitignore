@@ -1,6 +1,24 @@
 .vscode/settings.local.json
 *.swp
 .DS_Store
+.pytest_cache/
+
+# Credentials, auth, and private agent state
+.env
+.env.*
+!.env.example
+.hermes/
+**/auth.json
+**/state.db
+**/state.db-*
+**/memories/
+**/sessions/
+*.pem
+*.key
+id_rsa
+id_ed25519
+kubeconfig
+*.kubeconfig
 
 # Training Factory runtime and local infrastructure state
 .cka-factory/

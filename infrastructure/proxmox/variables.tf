@@ -1,5 +1,5 @@
 variable "proxmox_endpoint" {
-  description = "Proxmox API URL, for example https://proxmox.example:8006/"
+  description = "Proxmox API URL, for example https://proxmox.example.com:8006/"
   type        = string
 }
 
@@ -15,8 +15,8 @@ variable "proxmox_insecure" {
 }
 
 variable "proxmox_node_name" {
-  type    = string
-  default = "proxmox.example"
+  description = "Proxmox node that hosts the disposable factory guests"
+  type        = string
 }
 
 variable "template_vm_id" {
@@ -58,8 +58,13 @@ variable "worker_address" {
 }
 
 variable "admin_username" {
-  type    = string
-  default = "cka"
+  description = "Cloud-init account used by Ansible"
+  type        = string
+
+  validation {
+    condition     = can(regex("^[a-z_][a-z0-9_-]{0,31}$", var.admin_username))
+    error_message = "admin_username must be a valid Linux account name using lowercase letters, digits, underscores, or hyphens."
+  }
 }
 
 variable "ssh_public_keys" {

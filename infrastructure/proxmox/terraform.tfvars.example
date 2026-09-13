@@ -1,6 +1,6 @@
-proxmox_endpoint     = "https://proxmox.example:8006/"
+proxmox_endpoint     = "https://proxmox.example.com:8006/"
 proxmox_insecure     = false
-proxmox_node_name    = "proxmox.example"
+proxmox_node_name    = "REPLACE_ME"
 template_vm_id       = 9000
 datastore_id         = "local-lvm"
 network_bridge       = "vmbr1"

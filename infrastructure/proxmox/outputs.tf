@@ -8,3 +8,8 @@ output "nodes" {
     }
   }
 }
+
+output "admin_username" {
+  description = "Cloud-init account used by factory automation"
+  value       = var.admin_username
+}

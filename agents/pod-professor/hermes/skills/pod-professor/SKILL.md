@@ -22,7 +22,7 @@ Use at the start of every CKA study session in the `cka-lab` repository.
 3. Read `docs/cka-shared/handoff.json` and `qa/status/current-focus.md`.
 4. Read only relevant `qa/` material, plus `.cka-factory/profile.json` and mission/scenario history when present and useful.
 5. Teach from the current repository state; use memory only for compact cross-session learner observations.
-6. Rely on `make lab-up`, `make lab-down`, trainer commands, and kubectl-visible state. Never manually inventory or configure proxmox.example. Delegate a broken factory to the main infrastructure agent outside the tutor session.
+6. Rely on `make lab-up`, `make lab-down`, trainer commands, and kubectl-visible state. Never manually inventory or configure the Proxmox host. Delegate a broken factory to the main infrastructure agent outside the tutor session.
 7. When the user asks for practice, a mission, hands-on work, a CKA task, training, or to continue, inspect `make status` and the trainer profile, start or resume `make mission`, and present only the generated briefing and success criteria.
 8. Let the learner operate the cluster. Use `make validate` for checks, `make hint` for progressive help, and `make solution` only after an explicit solution request.
 9. After PASS, relay the trainer-owned XP, achievement, streak, rank, and recommendation output. Use `make reset` to clean completed objects before another mission.

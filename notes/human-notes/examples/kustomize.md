@@ -30,7 +30,7 @@ namePrefix: KAPPEL.TECH-
 
 ```yaml
 commonAnnotations:
-  owner: Dennis Kappel
+  owner: Example Maintainer
   project: demo
   description: Demo application
 ```

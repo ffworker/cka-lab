@@ -317,6 +317,21 @@ def test_taint_mission_only_removes_its_exact_owned_taint():
     assert 'eq .value "dedicated"' in validator
 
 
+def test_factory_uses_configured_admin_username():
+    script = (REPO / "scripts/lab-factory.sh").read_text()
+    outputs = (REPO / "infrastructure/proxmox/outputs.tf").read_text()
+    variables = (REPO / "infrastructure/proxmox/variables.tf").read_text()
+    example = (REPO / "infrastructure/proxmox/terraform.tfvars.example").read_text()
+    private_host = "pve" + "01"
+
+    assert 'terraform -chdir="$TF_DIR" output -raw admin_username' in script
+    assert '"${admin_username}@$ip"' in script
+    assert "output \"admin_username\"" in outputs
+    assert "admin_username must be a valid Linux account name" in variables
+    assert private_host not in variables
+    assert private_host not in example
+
+
 def test_existing_profile_is_validated(tmp_path):
     (tmp_path / "profile.json").write_text('{"xp": "many"}')
     with pytest.raises(ValueError, match="invalid profile"):

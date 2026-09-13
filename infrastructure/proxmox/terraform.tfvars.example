@@ -1,0 +1,13 @@
+proxmox_endpoint     = "https://proxmox.example:8006/"
+proxmox_insecure     = false
+proxmox_node_name    = "proxmox.example"
+template_vm_id       = 9000
+datastore_id         = "local-lvm"
+network_bridge       = "vmbr1"
+gateway              = "192.0.2.1"
+control_plane_address = "192.0.2.10/24"
+worker_address        = "192.0.2.11/24"
+admin_username        = "cka"
+ssh_public_keys       = ["ssh-ed25519 REPLACE_ME"]
+
+# Never store proxmox_api_token here. Export TF_VAR_proxmox_api_token.

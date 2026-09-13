@@ -1,0 +1,12 @@
+{
+  "ranks": [
+    {"name": "YAML Goblin", "minimumXp": 0},
+    {"name": "Pod Whisperer", "minimumXp": 250},
+    {"name": "CrashLoop Exorcist", "minimumXp": 600},
+    {"name": "DNS Detective", "minimumXp": 1000},
+    {"name": "RBAC Sheriff", "minimumXp": 1600},
+    {"name": "Scheduler Sorcerer", "minimumXp": 2400},
+    {"name": "etcd Necromancer", "minimumXp": 3400},
+    {"name": "Control Plane Commander", "minimumXp": 5000}
+  ]
+}

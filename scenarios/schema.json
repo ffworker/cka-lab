@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.cka-lab/scenario.schema.json",
+  "title": "CKA Training Factory scenario",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id", "title", "codename", "category", "topic", "difficulty",
+    "prerequisites", "learningStateTags", "revisionEligible",
+    "missionBriefing", "injector", "validator", "reset", "hints",
+    "solution", "xp"
+  ],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "title": {"type": "string", "minLength": 1},
+    "codename": {"type": "string", "minLength": 1},
+    "category": {"type": "string", "minLength": 1},
+    "topic": {"type": "string", "minLength": 1},
+    "difficulty": {"enum": ["easy", "medium", "hard", "exam"]},
+    "prerequisites": {"type": "array", "items": {"type": "string"}},
+    "learningStateTags": {"type": "array", "items": {"type": "string"}},
+    "revisionEligible": {"type": "boolean"},
+    "missionBriefing": {"type": "string", "minLength": 1},
+    "injector": {"type": "string", "minLength": 1},
+    "validator": {"type": "string", "minLength": 1},
+    "reset": {"type": "string", "minLength": 1},
+    "hints": {
+      "type": "array",
+      "prefixItems": [{"type": "string"}, {"type": "string"}],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "solution": {"type": "string", "minLength": 1},
+    "xp": {"type": "integer", "minimum": 1},
+    "targetTimeMinutes": {"type": "integer", "minimum": 1}
+  }
+}

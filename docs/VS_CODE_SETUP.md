@@ -8,12 +8,12 @@ Use this repo as the practical IDE workspace tied to GitHub.
 
 - open `cka-lab` as the VS Code folder
 - connect it to its own GitHub repo
-- initialize the `cka-shared` git submodule after cloning
+- use the learning-state contract tracked in this repository
 - use chat inside the IDE for practical tasks only
 
 ## Important
 
-The IDE agent should read `cka-shared/handoff.json` before suggesting drills.
+The IDE agent should read `docs/cka-shared/handoff.json` before suggesting drills.
 
 ## Good prompts in the IDE
 
@@ -48,4 +48,4 @@ When you want the IDE assistant to review your work and guide you step-by-step:
 
 Suggested prompt:
 
-`Use cka-shared/handoff.json and run a strict checkpoint coaching loop. I will paste output after each step. Correct me immediately and continue only when the current checkpoint is correct.`
+`Use docs/cka-shared/handoff.json and run a strict checkpoint coaching loop. I will paste output after each step. Correct me immediately and continue only when the current checkpoint is correct.`

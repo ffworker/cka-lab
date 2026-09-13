@@ -1,0 +1,10 @@
+{
+  "achievements": [
+    {"id": "no-hint-hero", "name": "No Hint Hero", "rule": "Complete a mission without hints."},
+    {"id": "phoenix-protocol", "name": "Phoenix Protocol", "rule": "Reset and then complete a mission."},
+    {"id": "first-attempt", "name": "One Shot, One Pod", "rule": "Validate successfully on the first attempt."},
+    {"id": "streak-three", "name": "Kubectl Hat Trick", "rule": "Complete missions on three study days in a row."},
+    {"id": "under-clock", "name": "Against the Clock", "rule": "Finish within the optional target time."},
+    {"id": "ten-missions", "name": "Cluster Regular", "rule": "Complete ten missions."}
+  ]
+}

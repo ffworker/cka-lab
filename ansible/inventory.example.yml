@@ -1,0 +1,14 @@
+all:
+  children:
+    control_plane:
+      hosts:
+        cka-cp01:
+          ansible_host: 192.0.2.10
+    workers:
+      hosts:
+        cka-worker01:
+          ansible_host: 192.0.2.11
+  vars:
+    ansible_user: cka
+    kubernetes_version: "REPLACE_ME"
+    pod_network_cidr: "10.244.0.0/16"

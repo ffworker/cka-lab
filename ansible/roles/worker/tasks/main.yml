@@ -1,0 +1,4 @@
+---
+- name: Describe worker bootstrap boundary
+  ansible.builtin.debug:
+    msg: "Skeleton: consume the short-lived kubeadm join command from the control-plane host."

@@ -1,0 +1,4 @@
+---
+- name: Describe control-plane bootstrap boundary
+  ansible.builtin.debug:
+    msg: "Skeleton: run kubeadm init, install a CNI, and publish a short-lived join command."

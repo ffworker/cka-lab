@@ -1,0 +1,10 @@
+---
+- name: Require explicit Kubernetes version
+  ansible.builtin.assert:
+    that:
+      - kubernetes_version != "REPLACE_ME"
+    fail_msg: Set kubernetes_version before running the bootstrap.
+
+- name: Describe common-node bootstrap boundary
+  ansible.builtin.debug:
+    msg: "Skeleton: install containerd and kubeadm packages, disable swap, and configure kernel prerequisites."

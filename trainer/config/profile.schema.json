@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Local CKA trainer profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "xp", "rank", "currentStreak", "bestStreak", "attempts",
+    "hintCount", "firstAttemptWins", "totalCompletionSeconds",
+    "achievements", "missionHistory"
+  ],
+  "properties": {
+    "xp": {"type": "integer", "minimum": 0},
+    "rank": {"type": "string"},
+    "currentStreak": {"type": "integer", "minimum": 0},
+    "bestStreak": {"type": "integer", "minimum": 0},
+    "attempts": {"type": "integer", "minimum": 0},
+    "hintCount": {"type": "integer", "minimum": 0},
+    "firstAttemptWins": {"type": "integer", "minimum": 0},
+    "totalCompletionSeconds": {"type": "integer", "minimum": 0},
+    "achievements": {"type": "array", "items": {"type": "string"}},
+    "missionHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scenarioId", "completedAt", "completionSeconds", "attempts",
+          "hintCount", "firstAttemptWin", "xpAwarded"
+        ],
+        "properties": {
+          "scenarioId": {"type": "string"},
+          "completedAt": {"type": "string", "format": "date-time"},
+          "completionSeconds": {"type": "integer", "minimum": 0},
+          "attempts": {"type": "integer", "minimum": 1},
+          "hintCount": {"type": "integer", "minimum": 0},
+          "firstAttemptWin": {"type": "boolean"},
+          "xpAwarded": {"type": "integer", "minimum": 0}
+        }
+      }
+    }
+  }
+}

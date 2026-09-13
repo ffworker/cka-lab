@@ -1,0 +1,33 @@
+{
+  "id": "service-endpoints",
+  "title": "Endpoints Were Inside You All Along",
+  "codename": "troubleshooting",
+  "category": "troubleshooting",
+  "topic": "Services",
+  "difficulty": "medium",
+  "prerequisites": [
+    "Services basics",
+    "Labels and Selectors"
+  ],
+  "learningStateTags": [
+    "improving",
+    "unstable"
+  ],
+  "revisionEligible": true,
+  "missionBriefing": "api-svc exists and its backend Pods are healthy, but the Service has no usable backends. Restore routing without recreating the Deployment or Service.",
+  "successCriteria": [
+    "api-svc selects the intended backend Pods.",
+    "Its EndpointSlice contains two ready endpoints.",
+    "The Service remains ClusterIP on port 80."
+  ],
+  "injector": "inject.sh",
+  "validator": "validate.sh",
+  "reset": "reset.sh",
+  "hints": [
+    "Trace Service to EndpointSlice to Pod; compare selectors with labels exactly.",
+    "The backend Pods carry app=mission-api. Make the existing Service select it."
+  ],
+  "solution": "solution.md",
+  "xp": 160,
+  "targetTimeMinutes": 8
+}

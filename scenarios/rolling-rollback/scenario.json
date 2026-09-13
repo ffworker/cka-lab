@@ -1,0 +1,33 @@
+{
+  "id": "rolling-rollback",
+  "title": "Release the Kraken, Then Roll It Back",
+  "codename": "workloads",
+  "category": "workloads",
+  "topic": "Rolling Updates / Rollbacks",
+  "difficulty": "medium",
+  "prerequisites": [
+    "Pods",
+    "ReplicaSets"
+  ],
+  "learningStateTags": [
+    "improving",
+    "unstable"
+  ],
+  "revisionEligible": true,
+  "missionBriefing": "A bad image was rolled into kraken. Restore the last healthy revision and confirm availability. Do not delete and recreate the Deployment.",
+  "successCriteria": [
+    "kraken runs nginx:1.27.",
+    "Three replicas are available.",
+    "Rollout history is preserved."
+  ],
+  "injector": "inject.sh",
+  "validator": "validate.sh",
+  "reset": "reset.sh",
+  "hints": [
+    "Inspect rollout status, ReplicaSets, and history.",
+    "The previous revision used nginx:1.27; use the rollout mechanism."
+  ],
+  "solution": "solution.md",
+  "xp": 180,
+  "targetTimeMinutes": 10
+}

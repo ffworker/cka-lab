@@ -7,7 +7,7 @@
   "required": [
     "id", "title", "codename", "category", "topic", "difficulty",
     "prerequisites", "learningStateTags", "revisionEligible",
-    "missionBriefing", "injector", "validator", "reset", "hints",
+    "missionBriefing", "successCriteria", "injector", "validator", "reset", "hints",
     "solution", "xp"
   ],
   "properties": {
@@ -21,6 +21,11 @@
     "learningStateTags": {"type": "array", "items": {"type": "string"}},
     "revisionEligible": {"type": "boolean"},
     "missionBriefing": {"type": "string", "minLength": 1},
+    "successCriteria": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "minItems": 1
+    },
     "injector": {"type": "string", "minLength": 1},
     "validator": {"type": "string", "minLength": 1},
     "reset": {"type": "string", "minLength": 1},

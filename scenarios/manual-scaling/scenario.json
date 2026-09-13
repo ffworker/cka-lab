@@ -1,0 +1,33 @@
+{
+  "id": "manual-scaling",
+  "title": "Four Pods, No More, No Less",
+  "codename": "workloads",
+  "category": "workloads",
+  "topic": "Manual Scaling",
+  "difficulty": "easy",
+  "prerequisites": [
+    "Pods",
+    "ReplicaSets"
+  ],
+  "learningStateTags": [
+    "improving",
+    "unstable"
+  ],
+  "revisionEligible": true,
+  "missionBriefing": "queue-processor is healthy but undersized. Scale it to required capacity and prove desired, current, ready, and available state converge.",
+  "successCriteria": [
+    "Exactly four replicas are desired.",
+    "Exactly four replicas are current and available.",
+    "All four Pods are Ready."
+  ],
+  "injector": "inject.sh",
+  "validator": "validate.sh",
+  "reset": "reset.sh",
+  "hints": [
+    "Inspect all Deployment replica counters.",
+    "Set the Deployment target to four and wait for convergence."
+  ],
+  "solution": "solution.md",
+  "xp": 120,
+  "targetTimeMinutes": 6
+}

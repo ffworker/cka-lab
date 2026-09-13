@@ -1,0 +1,33 @@
+{
+  "id": "deployment-replica-trail",
+  "title": "The Replica Trail",
+  "codename": "workloads",
+  "category": "workloads",
+  "topic": "Deployments",
+  "difficulty": "easy",
+  "prerequisites": [
+    "Pods",
+    "ReplicaSets"
+  ],
+  "learningStateTags": [
+    "weak",
+    "unstable"
+  ],
+  "revisionEligible": true,
+  "missionBriefing": "The signal-web Deployment should serve three healthy replicas, but the rollout is stalled. Repair the workload while preserving the Deployment and its ownership chain.",
+  "successCriteria": [
+    "signal-web uses nginx:1.27.",
+    "Exactly three desired and three available replicas exist.",
+    "All managed Pods are Ready."
+  ],
+  "injector": "inject.sh",
+  "validator": "validate.sh",
+  "reset": "reset.sh",
+  "hints": [
+    "Inspect the Deployment, its ReplicaSets, and Pod status before changing anything.",
+    "Compare the Pod template image with image-pull events, then repair the Deployment template."
+  ],
+  "solution": "solution.md",
+  "xp": 140,
+  "targetTimeMinutes": 8
+}

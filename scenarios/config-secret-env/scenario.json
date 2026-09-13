@@ -1,0 +1,34 @@
+{
+  "id": "config-secret-env",
+  "title": "Configuration Has Left the Container",
+  "codename": "configuration",
+  "category": "configuration",
+  "topic": "ConfigMaps",
+  "difficulty": "medium",
+  "prerequisites": [
+    "ConfigMaps",
+    "Secrets",
+    "Environment Variables"
+  ],
+  "learningStateTags": [
+    "improving",
+    "revision"
+  ],
+  "revisionEligible": true,
+  "missionBriefing": "env-reader cannot start because its external configuration contract is broken. Repair it so the container runs with the required ConfigMap mode and Secret-backed token.",
+  "successCriteria": [
+    "env-reader is Running.",
+    "APP_MODE equals practice.",
+    "TOKEN equals mission-token and remains Secret-backed."
+  ],
+  "injector": "inject.sh",
+  "validator": "validate.sh",
+  "reset": "reset.sh",
+  "hints": [
+    "Compare each env key reference with the ConfigMap and Secret keys.",
+    "The Pod expects app_mode in app-settings; create that exact key with value practice."
+  ],
+  "solution": "solution.md",
+  "xp": 170,
+  "targetTimeMinutes": 10
+}

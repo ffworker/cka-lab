@@ -1,8 +1,15 @@
 # Scenarios
 
-Future missions live in one directory per scenario with `scenario.json`, an
-injector, validator, reset script, and solution file. Metadata must satisfy
-`schema.json`. Mission briefings may describe symptoms and objectives but must
-not reveal the diagnosis.
+The first mission pack contains eight original CKA-style practical tasks based
+on the current handoff and ready-for-practice topics. Each directory contains
+schema-valid metadata, an idempotent injector, a cluster-state validator, a
+namespace-scoped reset, two progressive hints, and an explicit solution.
 
-No curriculum or real CKA scenarios are included in this skeleton.
+Mission briefings contain symptoms, objectives, and success criteria but never
+the diagnosis or repair commands. Runtime selection excludes anything listed in
+`notYetIntroduced`, prioritizes weak and unstable topics, and avoids immediate
+scenario repetition.
+
+Scenario scripts must operate only on their named `cka-mission-*` namespace.
+The taints mission is the sole node-scoped exception; its reset removes only the
+exact `training` taint it owns from `cka-worker01`.

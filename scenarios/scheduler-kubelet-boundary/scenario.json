@@ -1,0 +1,33 @@
+{
+  "id": "scheduler-kubelet-boundary",
+  "title": "The Placement\u2013Runtime Divide",
+  "codename": "troubleshooting",
+  "category": "troubleshooting",
+  "topic": "Kubernetes Components",
+  "difficulty": "medium",
+  "prerequisites": [
+    "Pods",
+    "Node Selectors"
+  ],
+  "learningStateTags": [
+    "improving",
+    "unstable"
+  ],
+  "revisionEligible": true,
+  "missionBriefing": "Two Pods are unhealthy for different reasons: one has never been assigned; the other was assigned but cannot start its container. Diagnose each boundary and make both Pods Running without changing their names.",
+  "successCriteria": [
+    "placement-case is Running.",
+    "runtime-case is Running with busybox:1.36.",
+    "Both original Pod names are preserved."
+  ],
+  "injector": "inject.sh",
+  "validator": "validate.sh",
+  "reset": "reset.sh",
+  "hints": [
+    "First ask whether .spec.nodeName is populated, then inspect events.",
+    "Remove the impossible nodeSelector from placement-case; repair the runtime-case image."
+  ],
+  "solution": "solution.md",
+  "xp": 180,
+  "targetTimeMinutes": 12
+}

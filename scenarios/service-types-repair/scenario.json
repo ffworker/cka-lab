@@ -1,0 +1,34 @@
+{
+  "id": "service-types-repair",
+  "title": "Two Doors, One Backend",
+  "codename": "networking",
+  "category": "networking",
+  "topic": "NodePort",
+  "difficulty": "medium",
+  "prerequisites": [
+    "ClusterIP basics",
+    "NodePort basics",
+    "Labels and Selectors"
+  ],
+  "learningStateTags": [
+    "improving",
+    "unstable"
+  ],
+  "revisionEligible": true,
+  "missionBriefing": "The storefront has internal and NodePort Services. Both objects exist, but neither provides the intended path to the healthy backend. Repair both without recreating the Deployment.",
+  "successCriteria": [
+    "store-internal is ClusterIP and targets port 80.",
+    "store-external is NodePort 30080 and targets port 80.",
+    "Both Services expose ready EndpointSlices."
+  ],
+  "injector": "inject.sh",
+  "validator": "validate.sh",
+  "reset": "reset.sh",
+  "hints": [
+    "A NodePort still depends on the selector and EndpointSlice chain.",
+    "Repair store-internal targetPort and store-external selector; preserve NodePort 30080."
+  ],
+  "solution": "solution.md",
+  "xp": 180,
+  "targetTimeMinutes": 12
+}

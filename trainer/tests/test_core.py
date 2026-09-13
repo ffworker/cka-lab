@@ -8,12 +8,16 @@ import pytest
 
 from trainer.core import (
     SELECTION_MODES,
+    complete_mission,
     default_profile,
     discover_scenarios,
     load_catalogue,
     load_or_create_profile,
     load_study_state,
+    next_hint,
     rank_for_xp,
+    rank_progress,
+    select_scenario,
     validate_scenario,
 )
 
@@ -44,6 +48,7 @@ def test_scenario_contract_discovery(tmp_path):
         "learningStateTags": ["weak"],
         "revisionEligible": True,
         "missionBriefing": "A symptom appears. Find the cause without assumptions.",
+        "successCriteria": ["The workload is healthy."],
         "injector": "inject.sh",
         "validator": "validate.sh",
         "reset": "reset.sh",
@@ -77,6 +82,7 @@ def test_scenario_runtime_validation_matches_contract(tmp_path):
         "learningStateTags": ["weak"],
         "revisionEligible": True,
         "missionBriefing": "briefing",
+        "successCriteria": ["The workload is healthy."],
         "injector": "../outside.sh",
         "validator": "validate.sh",
         "reset": "reset.sh",
@@ -106,6 +112,99 @@ def test_malformed_scenario_returns_errors_instead_of_crashing(tmp_path):
     assert "difficulty must be str" in errors
 
 
+def _scenario(identifier, topic, tags, *, xp=140, target=10):
+    return {
+        "id": identifier,
+        "title": identifier,
+        "topic": topic,
+        "learningStateTags": tags,
+        "xp": xp,
+        "targetTimeMinutes": target,
+        "hints": ["first", "second"],
+    }
+
+
+def test_scenario_selection_prioritizes_weak_state_and_avoids_last_mission():
+    scenarios = [
+        _scenario("deployment-trace", "Deployments", ["weak", "unstable"]),
+        _scenario("service-repair", "Services", ["improving", "unstable"]),
+        _scenario("taint-revision", "Taints and Tolerations", ["stable"]),
+    ]
+    state = {
+        "weakTopics": ["Deployments"],
+        "improvingTopics": ["Services"],
+        "stableTopics": ["Taints and Tolerations"],
+        "unstableConcepts": ["Deployment -> ReplicaSet -> Pods"],
+    }
+    profile = default_profile()
+    assert select_scenario(scenarios, state, profile, "mixed")["id"] == "deployment-trace"
+    profile["missionHistory"].append({"scenarioId": "deployment-trace"})
+    assert select_scenario(scenarios, state, profile, "mixed")["id"] == "service-repair"
+
+
+def test_selection_excludes_topics_not_yet_introduced():
+    future = _scenario("future-job", "Jobs", ["weak"])
+    ready = _scenario("pod-repair", "Pods", ["improving"])
+    state = {
+        "weakTopics": ["Jobs"],
+        "improvingTopics": ["Pods"],
+        "stableTopics": [],
+        "notYetIntroduced": ["Jobs"],
+    }
+
+    assert select_scenario([future, ready], state, default_profile(), "mixed")["id"] == "pod-repair"
+
+
+def test_progressive_hints_stop_after_two():
+    active = {"hintCount": 0}
+    scenario = _scenario("service-repair", "Services", ["improving"])
+    assert next_hint(active, scenario) == "first"
+    assert active["hintCount"] == 1
+    assert next_hint(active, scenario) == "second"
+    assert next_hint(active, scenario) is None
+
+
+def test_completion_awards_xp_history_achievements_and_rank():
+    profile = default_profile()
+    profile["xp"] = 200
+    active = {
+        "scenarioId": "deployment-trace",
+        "startedAt": "2026-09-13T14:00:00+00:00",
+        "attempts": 1,
+        "hintCount": 0,
+        "resetCount": 1,
+    }
+    scenario = _scenario("deployment-trace", "Deployments", ["weak"], xp=140, target=10)
+    ranks = [
+        {"name": "YAML Goblin", "minimumXp": 0},
+        {"name": "Pod Whisperer", "minimumXp": 250},
+    ]
+    achievements = [
+        {"id": "no-hint-hero", "name": "No Hint Hero"},
+        {"id": "phoenix-protocol", "name": "Phoenix Protocol"},
+        {"id": "first-attempt", "name": "One Shot, One Pod"},
+        {"id": "under-clock", "name": "Against the Clock"},
+    ]
+    result = complete_mission(
+        active,
+        scenario,
+        profile,
+        ranks,
+        achievements,
+        completed_at="2026-09-13T14:08:42+00:00",
+    )
+    assert profile["xp"] == 340
+    assert profile["rank"] == "Pod Whisperer"
+    assert profile["firstAttemptWins"] == 1
+    assert profile["missionHistory"][0]["completionSeconds"] == 522
+    assert profile["missionHistory"][0]["xpAwarded"] == 140
+    assert set(profile["achievements"]) == {
+        "no-hint-hero", "phoenix-protocol", "first-attempt", "under-clock"
+    }
+    assert result["oldRank"] == "YAML Goblin"
+    assert result["newRank"] == "Pod Whisperer"
+
+
 def test_scenario_discovery_rejects_symlinked_directory(tmp_path):
     outside = tmp_path / "outside"
     outside.mkdir()
@@ -115,6 +214,24 @@ def test_scenario_discovery_rejects_symlinked_directory(tmp_path):
     (catalog / "linked").symlink_to(outside, target_is_directory=True)
     with pytest.raises(ValueError, match="symlinked scenario directory"):
         discover_scenarios(catalog)
+
+
+def test_scenario_id_must_match_its_directory_name(tmp_path):
+    scenario = _scenario("different-id", "Pods", ["improving"])
+    scenario.update({
+        "injector": "inject.sh",
+        "validator": "validate.sh",
+        "reset": "reset.sh",
+        "solution": "solution.md",
+    })
+    directory = tmp_path / "directory-name"
+    directory.mkdir()
+    for field in ("injector", "validator", "reset", "solution"):
+        (directory / scenario[field]).write_text("placeholder\n")
+
+    assert "id must match scenario directory name" in validate_scenario(
+        scenario, directory
+    )
 
 
 def test_catalogues_and_profile_are_local_json():
@@ -133,6 +250,73 @@ def test_catalogues_and_profile_are_local_json():
     assert profile["missionHistory"] == []
 
 
+def test_rank_progress_reports_next_threshold_and_bar():
+    ranks = load_catalogue(REPO / "trainer/config/ranks.json", "ranks")
+
+    progress = rank_progress(140, ranks, width=20)
+
+    assert progress == {
+        "bar": "███████████░░░░░░░░░",
+        "nextRank": "Pod Whisperer",
+        "nextMinimumXp": 250,
+    }
+
+
+def test_endpoint_scenario_validators_query_actual_endpoint_slices():
+    scenarios = discover_scenarios(REPO / "scenarios")
+    endpoint_scenarios = [
+        item for item in scenarios
+        if any("EndpointSlice" in criterion for criterion in item["successCriteria"])
+    ]
+
+    assert endpoint_scenarios
+    for scenario in endpoint_scenarios:
+        validator = REPO / "scenarios" / scenario["id"] / scenario["validator"]
+        assert "endpointslice" in validator.read_text(encoding="utf-8").lower()
+
+
+def test_validators_check_the_full_declared_cluster_contract():
+    validators = {
+        scenario_id: (REPO / "scenarios" / scenario_id / "validate.sh").read_text()
+        for scenario_id in (
+            "deployment-replica-trail",
+            "service-endpoints",
+            "config-secret-env",
+            "rolling-rollback",
+        )
+    }
+
+    deployment = validators["deployment-replica-trail"]
+    for field in ("updatedReplicas", "readyReplicas", "availableReplicas"):
+        assert field in deployment
+    assert "condition=Ready" in deployment
+
+    service = validators["service-endpoints"]
+    assert "conditions.ready==true" in service
+    assert ".spec.type}:{.spec.ports[0].port" in service
+
+    configuration = validators["config-secret-env"]
+    assert "configMapKeyRef.name" in configuration
+    assert "configMapKeyRef.key" in configuration
+
+    rollback = validators["rolling-rollback"]
+    assert ".metadata.uid" in rollback
+    assert "ownerReferences" in rollback
+
+
+def test_taint_mission_only_removes_its_exact_owned_taint():
+    directory = REPO / "scenarios/taint-toleration"
+    injector = (directory / "inject.sh").read_text()
+    reset = (directory / "reset.sh").read_text()
+    validator = (directory / "validate.sh").read_text()
+
+    assert "training-" not in injector
+    assert "training-" not in reset
+    assert "training:NoSchedule-" in reset
+    assert "refusing to overwrite non-factory training taint" in injector
+    assert 'eq .value "dedicated"' in validator
+
+
 def test_existing_profile_is_validated(tmp_path):
     (tmp_path / "profile.json").write_text('{"xp": "many"}')
     with pytest.raises(ValueError, match="invalid profile"):
@@ -148,6 +332,7 @@ def test_make_mode_cannot_inject_shell_commands(tmp_path):
             text=True,
             capture_output=True,
             check=False,
+            env={**os.environ, "CKA_FACTORY_DRY_RUN": "1"},
         )
         assert result.returncode == 0, result.stderr
         assert not marker.exists()
@@ -168,3 +353,103 @@ def test_trainer_commands_respond_without_live_changes(command, tmp_path):
     )
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip()
+
+
+def test_cli_runs_a_complete_mission_loop(tmp_path):
+    scenario_root = tmp_path / "scenarios"
+    mission = scenario_root / "test-mission"
+    mission.mkdir(parents=True)
+    metadata = {
+        "id": "test-mission",
+        "title": "Test Mission",
+        "codename": "test-mission",
+        "category": "troubleshooting",
+        "topic": "Deployments",
+        "difficulty": "easy",
+        "prerequisites": ["Pods"],
+        "learningStateTags": ["weak"],
+        "revisionEligible": True,
+        "missionBriefing": "Repair the test workload.",
+        "successCriteria": ["The marker exists."],
+        "injector": "inject.sh",
+        "validator": "validate.sh",
+        "reset": "reset.sh",
+        "hints": ["Inspect the marker.", "Create the solved marker."],
+        "solution": "solution.md",
+        "xp": 140,
+        "targetTimeMinutes": 10,
+    }
+    (mission / "scenario.json").write_text(json.dumps(metadata))
+    (mission / "inject.sh").write_text("#!/bin/sh\ntouch \"$CKA_RUNTIME_DIR/injected\"\n")
+    (mission / "validate.sh").write_text(
+        "#!/bin/sh\ntest -f \"$CKA_RUNTIME_DIR/solved\"\n"
+    )
+    (mission / "reset.sh").write_text(
+        "#!/bin/sh\nrm -f \"$CKA_RUNTIME_DIR/injected\" \"$CKA_RUNTIME_DIR/solved\"\n"
+    )
+    (mission / "solution.md").write_text("Create the solved marker.\n")
+    for script in mission.glob("*.sh"):
+        script.chmod(0o755)
+    runtime = tmp_path / "runtime"
+    env = {
+        **os.environ,
+        "CKA_TRAINER_SCENARIO_ROOT": str(scenario_root),
+        "CKA_RUNTIME_DIR": str(runtime),
+    }
+
+    def run(command):
+        return subprocess.run(
+            [sys.executable, "-m", "trainer", "--runtime-dir", str(runtime), command],
+            cwd=REPO,
+            env=env,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+    started = run("mission")
+    assert started.returncode == 0
+    assert "Test Mission" in started.stdout
+    assert (runtime / "active-mission.json").is_file()
+    assert (runtime / "injected").is_file()
+    resumed = run("mission")
+    assert "Success criteria:" in resumed.stdout
+
+    failed = run("validate")
+    assert failed.returncode == 1
+    assert "MISSION FAILED" in failed.stdout
+    hint = run("hint")
+    assert "Inspect the marker." in hint.stdout
+    assert "Create the solved marker." in run("solution").stdout
+    restarted = run("reset")
+    assert restarted.returncode == 0
+    restarted_active = json.loads((runtime / "active-mission.json").read_text())
+    assert restarted_active["attempts"] == 1
+    assert restarted_active["hintCount"] == 1
+    assert restarted_active["resetCount"] == 1
+
+    (runtime / "solved").touch()
+    passed = run("validate")
+    assert passed.returncode == 0
+    assert "MISSION COMPLETE" in passed.stdout
+    profile = json.loads((runtime / "profile.json").read_text())
+    assert profile["xp"] == 140
+    assert profile["missionHistory"][0]["scenarioId"] == "test-mission"
+
+    (mission / "reset.sh").write_text("#!/bin/sh\nexit 1\n")
+    (mission / "reset.sh").chmod(0o755)
+    blocked_reset = run("reset")
+    assert blocked_reset.returncode == 1
+    assert (runtime / "active-mission.json").is_file()
+    blocked_start = run("mission")
+    assert blocked_start.returncode == 1
+    assert (runtime / "active-mission.json").is_file()
+
+    (mission / "reset.sh").write_text(
+        "#!/bin/sh\nrm -f \"$CKA_RUNTIME_DIR/injected\" \"$CKA_RUNTIME_DIR/solved\"\n"
+    )
+    (mission / "reset.sh").chmod(0o755)
+    reset = run("reset")
+    assert reset.returncode == 0
+    assert not (runtime / "active-mission.json").exists()
+    assert not (runtime / "injected").exists()

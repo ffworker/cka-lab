@@ -1,0 +1,34 @@
+{
+  "id": "taint-toleration",
+  "title": "The Dedicated Node",
+  "codename": "scheduling",
+  "category": "scheduling",
+  "topic": "Taints and Tolerations",
+  "difficulty": "medium",
+  "prerequisites": [
+    "Pods",
+    "Node Selectors",
+    "Taints and Tolerations"
+  ],
+  "learningStateTags": [
+    "stable",
+    "revision"
+  ],
+  "revisionEligible": true,
+  "missionBriefing": "cka-worker01 is reserved for dedicated workloads. audit-agent must run there, but remains Pending. Make it eligible while preserving the reservation.",
+  "successCriteria": [
+    "The training=dedicated:NoSchedule taint remains.",
+    "audit-agent has a matching toleration.",
+    "audit-agent runs on cka-worker01."
+  ],
+  "injector": "inject.sh",
+  "validator": "validate.sh",
+  "reset": "reset.sh",
+  "hints": [
+    "Inspect Pod events and node taints together.",
+    "Add an Equal/NoSchedule toleration matching training=dedicated."
+  ],
+  "solution": "solution.md",
+  "xp": 170,
+  "targetTimeMinutes": 10
+}

@@ -1,0 +1,1 @@
+Patch store-internal targetPort to 80 and store-external selector to app=storefront. Preserve NodePort 30080, then inspect both EndpointSlices.

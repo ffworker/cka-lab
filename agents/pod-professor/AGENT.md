@@ -27,3 +27,18 @@ Do not silently rewrite `weakTopics`, `improvingTopics`, `stableTopics`, or `not
 ## Scope
 
 Teach and assess CKA material represented in this repository. The main infrastructure agent owns factory maintenance. Do not manually inventory or configure `proxmox.example`; normally use `make lab-up`, `make lab-down`, trainer commands, and kubectl-visible training state. If `lab-up` fails, delegate infrastructure repair out of the tutor session. Do not create scenarios unless explicitly asked in a separate task.
+
+## Practical-first mode
+
+Treat `practice`, `mission`, `let's train`, `CKA task`, `hands on`, and `continue` as requests to enter practical-first mode:
+
+1. Inspect the handoff, current focus, trainer profile, and active mission state.
+2. Run `make status`; use `make lab-up` only when the disposable cluster is absent.
+3. Run `make mission` and present only its briefing and success criteria.
+4. Let Dennis work. Interpret pasted commands and output without taking over the task.
+5. Use `make validate` when Dennis asks for a check or believes the task is complete.
+6. Use `make hint` progressively; never expose `make solution` unless Dennis explicitly requests the solution.
+7. After a failed attempt, give a short just-in-time repair explanation and return immediately to practical work.
+8. After PASS, present the trainer's XP, achievements, streak, rank, and next recommendation. Use `make reset` before starting the next mission.
+
+Do not default to broad theory quizzes during practical-first mode. Choose the next task from trainer history and current weak/unstable state rather than inventing a separate progression.

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +28,7 @@ REQUIRED_SCENARIO_FIELDS = {
     "learningStateTags": list,
     "revisionEligible": bool,
     "missionBriefing": str,
+    "successCriteria": list,
     "injector": str,
     "validator": str,
     "reset": str,
@@ -76,6 +77,8 @@ def validate_scenario(scenario: Any, directory: Path) -> list[str]:
     identifier = scenario.get("id")
     if isinstance(identifier, str) and not re.fullmatch(r"[a-z0-9][a-z0-9-]*", identifier):
         errors.append("id must use lowercase letters, numbers, and hyphens")
+    if isinstance(identifier, str) and identifier != directory.name:
+        errors.append("id must match scenario directory name")
     string_fields = (
         "title", "codename", "category", "topic", "missionBriefing",
         "injector", "validator", "reset", "solution",
@@ -88,6 +91,11 @@ def validate_scenario(scenario: Any, directory: Path) -> list[str]:
         values = scenario.get(field)
         if isinstance(values, list) and any(not isinstance(value, str) for value in values):
             errors.append(f"{field} entries must be strings")
+    criteria = scenario.get("successCriteria")
+    if isinstance(criteria, list) and (
+        not criteria or any(not isinstance(item, str) or not item for item in criteria)
+    ):
+        errors.append("successCriteria must contain non-empty strings")
     hints = scenario.get("hints")
     if isinstance(hints, list) and len(hints) != 2:
         errors.append("hints must contain exactly two entries")
@@ -139,6 +147,151 @@ def load_catalogue(path: Path, key: str) -> list[dict[str, Any]]:
 def rank_for_xp(xp: int, ranks: list[dict[str, Any]]) -> str:
     eligible = [rank for rank in ranks if xp >= rank["minimumXp"]]
     return max(eligible, key=lambda rank: rank["minimumXp"])["name"]
+
+
+def rank_progress(
+    xp: int, ranks: list[dict[str, Any]], *, width: int = 20
+) -> dict[str, Any]:
+    ordered = sorted(ranks, key=lambda rank: rank["minimumXp"])
+    current_index = max(
+        index for index, rank in enumerate(ordered) if xp >= rank["minimumXp"]
+    )
+    if current_index == len(ordered) - 1:
+        return {"bar": "█" * width, "nextRank": None, "nextMinimumXp": None}
+    current = ordered[current_index]
+    following = ordered[current_index + 1]
+    span = following["minimumXp"] - current["minimumXp"]
+    gained = xp - current["minimumXp"]
+    filled = min(width, gained * width // span)
+    return {
+        "bar": "█" * filled + "░" * (width - filled),
+        "nextRank": following["name"],
+        "nextMinimumXp": following["minimumXp"],
+    }
+
+
+def select_scenario(
+    scenarios: list[dict[str, Any]],
+    study: dict[str, Any],
+    profile: dict[str, Any],
+    mode: str,
+) -> dict[str, Any]:
+    if not scenarios:
+        raise ValueError("no scenarios available")
+    not_introduced = set(study.get("notYetIntroduced", []))
+    eligible = [
+        item for item in scenarios
+        if item.get("topic") not in not_introduced
+        and not not_introduced.intersection(item.get("prerequisites", []))
+    ]
+    if not eligible:
+        raise ValueError("no scenarios are eligible for the current learning state")
+    last_id = None
+    if profile.get("missionHistory"):
+        last_id = profile["missionHistory"][-1].get("scenarioId")
+    candidates = [item for item in eligible if item["id"] != last_id] or eligible
+
+    weak = set(study.get("weakTopics", []))
+    improving = set(study.get("improvingTopics", []))
+    stable = set(study.get("stableTopics", []))
+
+    def score(item: dict[str, Any]) -> tuple[int, str]:
+        tags = set(item.get("learningStateTags", []))
+        topic = item.get("topic")
+        value = 0
+        if mode in {"weak", "mixed", "timed", "mock-exam"}:
+            value += 100 if topic in weak or "weak" in tags else 0
+        if mode in {"improving", "mixed", "timed", "mock-exam"}:
+            value += 50 if topic in improving or "improving" in tags else 0
+        if mode in {"troubleshooting", "mixed", "mock-exam"}:
+            value += 70 if "unstable" in tags else 0
+            value += 30 if item.get("category") == "troubleshooting" else 0
+        if mode in {"stable", "mixed", "random"}:
+            value += 20 if topic in stable and item.get("revisionEligible") else 0
+        return (-value, item["id"])
+
+    return sorted(candidates, key=score)[0]
+
+
+def next_hint(active: dict[str, Any], scenario: dict[str, Any]) -> str | None:
+    index = active.get("hintCount", 0)
+    hints = scenario["hints"]
+    if index >= len(hints):
+        return None
+    active["hintCount"] = index + 1
+    return hints[index]
+
+
+def complete_mission(
+    active: dict[str, Any],
+    scenario: dict[str, Any],
+    profile: dict[str, Any],
+    ranks: list[dict[str, Any]],
+    achievements: list[dict[str, Any]],
+    *,
+    completed_at: str,
+) -> dict[str, Any]:
+    finished = datetime.fromisoformat(completed_at.replace("Z", "+00:00"))
+    started = datetime.fromisoformat(active["startedAt"].replace("Z", "+00:00"))
+    completion_seconds = max(0, int((finished - started).total_seconds()))
+    attempts = active["attempts"]
+    hints = active.get("hintCount", 0)
+    old_rank = rank_for_xp(profile["xp"], ranks)
+
+    profile["xp"] += scenario["xp"]
+    profile["attempts"] += attempts
+    profile["hintCount"] += hints
+    profile["totalCompletionSeconds"] += completion_seconds
+    first_attempt = attempts == 1
+    if first_attempt:
+        profile["firstAttemptWins"] += 1
+
+    previous_day = None
+    if profile["missionHistory"]:
+        previous = datetime.fromisoformat(
+            profile["missionHistory"][-1]["completedAt"].replace("Z", "+00:00")
+        )
+        previous_day = previous.date()
+    finished_day = finished.date()
+    if previous_day == finished_day:
+        profile["currentStreak"] = max(1, profile["currentStreak"])
+    elif previous_day == finished_day - timedelta(days=1):
+        profile["currentStreak"] += 1
+    else:
+        profile["currentStreak"] = 1
+    profile["bestStreak"] = max(profile["bestStreak"], profile["currentStreak"])
+
+    profile["missionHistory"].append({
+        "scenarioId": scenario["id"],
+        "completedAt": completed_at,
+        "completionSeconds": completion_seconds,
+        "attempts": attempts,
+        "hintCount": hints,
+        "firstAttemptWin": first_attempt,
+        "xpAwarded": scenario["xp"],
+    })
+    unlocked_rules = {
+        "no-hint-hero": hints == 0,
+        "phoenix-protocol": active.get("resetCount", 0) > 0,
+        "first-attempt": first_attempt,
+        "streak-three": profile["currentStreak"] >= 3,
+        "under-clock": completion_seconds <= scenario.get("targetTimeMinutes", 0) * 60,
+        "ten-missions": len(profile["missionHistory"]) >= 10,
+    }
+    names = {item["id"]: item["name"] for item in achievements}
+    newly_unlocked = []
+    for identifier, earned in unlocked_rules.items():
+        if earned and identifier in names and identifier not in profile["achievements"]:
+            profile["achievements"].append(identifier)
+            newly_unlocked.append(names[identifier])
+    profile["rank"] = rank_for_xp(profile["xp"], ranks)
+    return {
+        "completionSeconds": completion_seconds,
+        "xpAwarded": scenario["xp"],
+        "oldRank": old_rank,
+        "newRank": profile["rank"],
+        "achievements": newly_unlocked,
+    }
 
 
 def default_profile() -> dict[str, Any]:

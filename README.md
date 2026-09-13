@@ -32,8 +32,14 @@ requested learning work, but do not route it through normal product CD.
 
 The factory provisions an isolated, disposable two-node kubeadm cluster on
 `proxmox.example`, bootstraps it with Ansible, and exposes its kubeconfig through the
-local runtime directory. It contains no real CKA scenarios yet.
+local runtime directory. Eight practical missions are available through the
+trainer.
 
 Run `make lab-up` to create or reconcile the cluster and `make lab-down` to
 destroy only factory-owned resources. The main infrastructure agent owns
 factory maintenance and failures; tutor sessions consume the resulting cluster.
+
+Use `make mission`, `make validate`, `make hint`, `make solution`, `make reset`,
+and `make profile` for the playable loop. Pod-Professor owns the learner
+experience and normally drives these commands; it delegates broken factory
+infrastructure back to the main infrastructure agent.

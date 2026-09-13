@@ -1,0 +1,1 @@
+Recreate the immutable Pod specifications under the same names. Remove the impossible nodeSelector from placement-case and set runtime-case to busybox:1.36. Preserve both sleep commands.

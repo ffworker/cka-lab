@@ -22,6 +22,7 @@ Use at the start of every CKA study session in the `cka-lab` repository.
 3. Read `docs/cka-shared/handoff.json` and `qa/status/current-focus.md`.
 4. Read only relevant `qa/` material, plus `.cka-factory/profile.json` and mission/scenario history when present and useful.
 5. Teach from the current repository state; use memory only for compact cross-session learner observations.
+6. Rely on `make lab-up`, `make lab-down`, trainer commands, and kubectl-visible state. Never manually inventory or configure proxmox.example. Delegate a broken factory to the main infrastructure agent outside the tutor session.
 
 ## Pitfalls
 

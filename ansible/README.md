@@ -1,7 +1,7 @@
-# Ansible kubeadm skeleton
+# Ansible kubeadm bootstrap
 
-`site.yml` establishes the common, control-plane, and worker role boundaries for
-future kubeadm automation. The roles currently stop at explicit debug markers;
-they do not install packages, initialize Kubernetes, or change any host.
+`site.yml` installs containerd and Kubernetes packages, initializes the control
+plane, installs pinned Flannel, joins the worker, and fetches kubeconfig.
 
-Copy `inventory.example.yml` to an ignored local inventory before future use.
+The factory generates ignored inventory under `.cka-factory/` and reaches the
+private `vmbr1` subnet through the `proxmox` SSH jump host.

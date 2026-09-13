@@ -24,11 +24,14 @@ locals {
 resource "proxmox_virtual_environment_vm" "cka_node" {
   for_each = local.nodes
 
-  name      = each.value.name
-  node_name = var.proxmox_node_name
-  vm_id     = each.value.vm_id
-  started   = false
-  tags      = ["cka", "disposable", each.value.role]
+  name            = each.value.name
+  node_name       = var.proxmox_node_name
+  vm_id           = each.value.vm_id
+  pool_id         = "cka-factory"
+  started         = true
+  on_boot         = false
+  stop_on_destroy = true
+  tags            = ["cka", "cka-factory", "disposable", each.value.role]
 
   clone {
     vm_id = var.template_vm_id
@@ -57,10 +60,15 @@ resource "proxmox_virtual_environment_vm" "cka_node" {
 
   network_device {
     bridge = var.network_bridge
+    model  = "virtio"
   }
 
   initialization {
     datastore_id = var.datastore_id
+
+    dns {
+      servers = var.dns_servers
+    }
 
     ip_config {
       ipv4 {
@@ -72,6 +80,13 @@ resource "proxmox_virtual_environment_vm" "cka_node" {
     user_account {
       username = var.admin_username
       keys     = var.ssh_public_keys
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition     = contains([110, 111], each.value.vm_id)
+      error_message = "The CKA factory may manage only reserved VM IDs 110 and 111."
     }
   }
 }

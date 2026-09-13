@@ -1,10 +1,120 @@
 ---
-- name: Require explicit Kubernetes version
+- name: Validate factory Kubernetes version
   ansible.builtin.assert:
     that:
-      - kubernetes_version != "REPLACE_ME"
-    fail_msg: Set kubernetes_version before running the bootstrap.
+      - kubernetes_version is match('^v[0-9]+\\.[0-9]+$')
+    fail_msg: kubernetes_version must be a supported minor such as v1.37.
 
-- name: Describe common-node bootstrap boundary
-  ansible.builtin.debug:
-    msg: "Skeleton: install containerd and kubeadm packages, disable swap, and configure kernel prerequisites."
+- name: Install node prerequisites
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - containerd
+      - curl
+      - gpg
+      - qemu-guest-agent
+    state: present
+    update_cache: true
+    lock_timeout: 300
+
+- name: Enable the QEMU guest agent
+  ansible.builtin.service:
+    name: qemu-guest-agent
+    enabled: true
+    state: started
+
+- name: Disable swap immediately
+  ansible.builtin.command: swapoff -a
+  when: ansible_facts["swaptotal_mb"] | int > 0
+  changed_when: true
+
+- name: Disable configured swap persistently
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^([^#].*\s+swap\s+.*)$'
+    replace: '# \1'
+
+- name: Load Kubernetes kernel modules on boot
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/k8s.conf
+    mode: "0644"
+    content: |
+      overlay
+      br_netfilter
+
+- name: Load Kubernetes kernel modules now
+  ansible.builtin.command: "modprobe {{ item }}"
+  loop:
+    - overlay
+    - br_netfilter
+  changed_when: false
+
+- name: Configure Kubernetes networking sysctls
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-kubernetes-cri.conf
+    mode: "0644"
+    content: |
+      net.bridge.bridge-nf-call-iptables = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.ipv4.ip_forward = 1
+  notify: Reload sysctl
+
+- name: Generate the default containerd configuration
+  ansible.builtin.command: containerd config default
+  register: containerd_default_config
+  changed_when: false
+
+- name: Install the containerd configuration
+  ansible.builtin.copy:
+    dest: /etc/containerd/config.toml
+    mode: "0644"
+    content: >-
+      {{ containerd_default_config.stdout
+         | regex_replace('SystemdCgroup = false', 'SystemdCgroup = true')
+         | regex_replace('bin_dir = "/usr/lib/cni"', 'bin_dir = "/opt/cni/bin"') }}
+  notify: Restart containerd
+
+- name: Create the Kubernetes apt keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Install the Kubernetes repository signing key
+  ansible.builtin.get_url:
+    url: "https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/Release.key"
+    dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
+    mode: "0644"
+
+- name: Configure the Kubernetes package repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/ /"
+    filename: kubernetes
+    state: present
+
+- name: Install kubeadm node packages
+  ansible.builtin.apt:
+    name:
+      - kubeadm
+      - kubelet
+      - kubectl
+    state: present
+    update_cache: true
+    lock_timeout: 300
+
+- name: Hold Kubernetes packages at the selected minor
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - kubeadm
+    - kubelet
+    - kubectl
+
+- name: Enable kubelet
+  ansible.builtin.service:
+    name: kubelet
+    enabled: true
+
+- name: Apply common service handlers before kubeadm
+  ansible.builtin.meta: flush_handlers

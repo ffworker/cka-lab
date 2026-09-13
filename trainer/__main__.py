@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import subprocess
 from pathlib import Path
 
 from .core import (
@@ -37,7 +39,27 @@ def main() -> int:
 
     if args.command == "status":
         study = load_study_state(REPO / "docs/cka-shared/handoff.json")
-        print(f"factory: skeleton | cluster: not provisioned | scenarios: {len(scenarios)}")
+        kubeconfig = args.runtime_dir / "kubeconfig"
+        cluster_status = "not provisioned"
+        if kubeconfig.is_file():
+            env = {**os.environ, "KUBECONFIG": str(kubeconfig)}
+            try:
+                nodes = subprocess.run(
+                    ["kubectl", "get", "nodes", "--no-headers"],
+                    env=env,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                    timeout=10,
+                )
+                lines = nodes.stdout.splitlines()
+                if nodes.returncode == 0 and len(lines) == 2 and all(" Ready " in f" {line} " for line in lines):
+                    cluster_status = "ready (2 nodes)"
+                else:
+                    cluster_status = "unreachable or not ready"
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                cluster_status = "unreachable or not ready"
+        print(f"factory: active | cluster: {cluster_status} | scenarios: {len(scenarios)}")
         print(f"study-state: loaded | weak: {len(study['weakTopics'])} | ready: {len(study['readyForPractice'])}")
     elif args.command == "profile":
         print(json.dumps(profile, indent=2))
@@ -48,8 +70,14 @@ def main() -> int:
         else:
             print(f"mission mode {args.mode}: no scenarios available; awaiting curriculum")
     elif args.command in {"lab-up", "lab-down"}:
-        action = "provision" if args.command == "lab-up" else "destroy"
-        print(f"{args.command}: dry skeleton only; would {action} cka-cp01 and cka-worker01")
+        if os.environ.get("CKA_FACTORY_DRY_RUN") == "1":
+            print(f"{args.command}: factory command available (dry run)")
+        else:
+            subprocess.run(
+                [REPO / "scripts/lab-factory.sh", args.command, args.runtime_dir],
+                cwd=REPO,
+                check=True,
+            )
     else:
         print(f"{args.command}: no active mission")
     return 0

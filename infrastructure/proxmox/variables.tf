@@ -32,10 +32,21 @@ variable "datastore_id" {
 variable "network_bridge" {
   type    = string
   default = "vmbr1"
+
+  validation {
+    condition     = var.network_bridge == "vmbr1"
+    error_message = "The CKA factory is restricted to the isolated vmbr1 bridge."
+  }
 }
 
 variable "gateway" {
   type = string
+}
+
+variable "dns_servers" {
+  description = "Resolvers reachable from the isolated lab subnet"
+  type        = list(string)
+  default     = ["1.1.1.1", "9.9.9.9"]
 }
 
 variable "control_plane_address" {

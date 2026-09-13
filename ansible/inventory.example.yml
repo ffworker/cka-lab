@@ -3,12 +3,13 @@ all:
     control_plane:
       hosts:
         cka-cp01:
-          ansible_host: 192.0.2.10
+          ansible_host: REPLACE_ME
     workers:
       hosts:
         cka-worker01:
-          ansible_host: 192.0.2.11
+          ansible_host: REPLACE_ME
   vars:
     ansible_user: cka
-    kubernetes_version: "REPLACE_ME"
+    kubernetes_version: "v1.37"
     pod_network_cidr: "10.244.0.0/16"
+    flannel_version: "v0.28.8"

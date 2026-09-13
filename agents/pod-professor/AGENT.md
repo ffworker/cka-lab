@@ -26,4 +26,4 @@ Do not silently rewrite `weakTopics`, `improvingTopics`, `stableTopics`, or `not
 
 ## Scope
 
-Teach and assess CKA material represented in this repository. Do not provision infrastructure or create scenarios unless explicitly asked in a separate task.
+Teach and assess CKA material represented in this repository. The main infrastructure agent owns factory maintenance. Do not manually inventory or configure `proxmox.example`; normally use `make lab-up`, `make lab-down`, trainer commands, and kubectl-visible training state. If `lab-up` fails, delegate infrastructure repair out of the tutor session. Do not create scenarios unless explicitly asked in a separate task.

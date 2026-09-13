@@ -1,4 +1,14 @@
 ---
-- name: Describe worker bootstrap boundary
-  ansible.builtin.debug:
-    msg: "Skeleton: consume the short-lived kubeadm join command from the control-plane host."
+- name: Check whether the worker is joined
+  ansible.builtin.stat:
+    path: /etc/kubernetes/kubelet.conf
+  register: worker_kubelet_conf
+
+- name: Join the worker to the control plane
+  ansible.builtin.command: >-
+    {{ hostvars[groups['control_plane'][0]].kubeadm_join_command }}
+    --node-name {{ inventory_hostname }}
+    --cri-socket unix:///run/containerd/containerd.sock
+  when: not worker_kubelet_conf.stat.exists
+  changed_when: true
+  no_log: true

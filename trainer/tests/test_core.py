@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -163,6 +164,7 @@ def test_trainer_commands_respond_without_live_changes(command, tmp_path):
         text=True,
         capture_output=True,
         check=False,
+        env={**os.environ, "CKA_FACTORY_DRY_RUN": "1"},
     )
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip()

@@ -1,5 +1,5 @@
 output "nodes" {
-  description = "Disposable CKA nodes; VMs remain stopped after creation"
+  description = "Disposable CKA nodes"
   value = {
     for key, vm in proxmox_virtual_environment_vm.cka_node : key => {
       name       = vm.name

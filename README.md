@@ -28,12 +28,12 @@ stored directly in this repository; there is no submodule dependency.
 This is a learning workspace, not a product repository. Use Linear for
 requested learning work, but do not route it through normal product CD.
 
-## Training Factory skeleton
+## Training Factory
 
-The reusable skeleton includes a stopped-by-default two-node Proxmox definition,
-kubeadm Ansible role boundaries, a scenario contract, a local trainer/profile,
-and Make targets. It contains no curriculum or real CKA scenarios yet.
+The factory provisions an isolated, disposable two-node kubeadm cluster on
+`proxmox.example`, bootstraps it with Ansible, and exposes its kubeconfig through the
+local runtime directory. It contains no real CKA scenarios yet.
 
-Run `make status`, `make mission`, or `make profile` locally. Infrastructure
-targets remain non-operative skeleton responses until explicit provisioning is
-wired in.
+Run `make lab-up` to create or reconcile the cluster and `make lab-down` to
+destroy only factory-owned resources. The main infrastructure agent owns
+factory maintenance and failures; tutor sessions consume the resulting cluster.

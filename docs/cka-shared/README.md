@@ -1,55 +1,16 @@
-# cka-shared
+# Internal learning-state contract
 
-Shared bridge between:
-- `cka-qa` for theory, quizzes, repetition, and progress tracking
-- `cka-lab` for practical work, manifests, kubectl drills, and troubleshooting labs
-
-## Contract
-
-Primary file:
-- `handoff.json`
+`docs/cka-shared/handoff.json` aligns theory and practical training inside the
+single `cka-lab` repository. It is an ordinary tracked file, not a repository or
+submodule.
 
 ## Ownership
 
-- `cka-qa` updates `theoryStatus` and `practicalFocus`
-- `cka-lab` updates `practicalFeedback`
-- both may refresh `lastUpdated`
+- Theory work in `qa/` updates `theoryStatus` and `practicalFocus`.
+- Practical work updates `practicalFeedback`.
+- Either side may update `lastUpdated` with the corresponding change.
 
-## Design rule
+Preserve the other side's fields. Keep the contract compact and
+machine-readable. Stable topics remain eligible for spaced revision.
 
-Keep this small, explicit, and machine-readable. Do not turn it into a second memory system.
-
-## Current study mode
-
-CKA learning is now theory plus build/break/fix practice. When `cka-qa`
-introduces or weakens a concept, `practicalFocus.recommendedDrills` should
-include a small hands-on drill that builds the component chain, breaks one link,
-fixes it, and forces a plain-language explanation.
-
-## Broader workflow
-
-### QA -> Shared
-`cka-qa` writes:
-- `theoryStatus`
-- `practicalFocus`
-
-### Lab -> Shared
-`cka-lab` writes:
-- `practicalFeedback`
-
-### Shared -> QA and Lab
-Both repos must read this file before planning work so theory and practice stay aligned.
-
-## Submodule rule
-
-In both parent repos, `cka-shared` is a git submodule.
-If `handoff.json` changes:
-1. commit and push inside `cka-shared`
-2. commit the updated submodule pointer in the parent repo
-
-## AI agents
-
-Any future AI agent working in this repo must read:
-- `AI-WORKFLOW.md`
-- `WORKFLOW.md`
-- `handoff.json`
+All updates are committed once at the `cka-lab` repository root.

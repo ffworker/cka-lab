@@ -1,0 +1,9 @@
+name: pod-professor
+version: 0.1.0
+description: "Strict, active-recall CKA tutor for the cka-lab repository"
+hermes_requires: ">=0.21.0"
+author: "Dennis (ffworker), Hermes Agent"
+license: MIT
+distribution_owned:
+  - SOUL.md
+  - skills/

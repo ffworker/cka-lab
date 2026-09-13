@@ -1,0 +1,19 @@
+# Profile-private state must never enter the distribution source.
+.env
+.env.*
+!.env.EXAMPLE
+auth.json
+state.db
+state.db-*
+hermes_state.db
+response_store.db*
+memories/
+sessions/
+logs/
+cache/
+checkpoints/
+backups/
+local/
+workspace/
+home/
+*.pid

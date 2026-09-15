@@ -4,7 +4,12 @@ CKA Lab's current backend provisions two kubeadm nodes on Proxmox VE. The setup 
 
 ## 1. Check the prerequisites
 
-On the Linux workstation that will run the trainer, install:
+The bundled installer in step 2 installs the local tools below through the
+detected `apt-get`, `dnf`, `pacman`, or `zypper` package manager. If your
+distribution does not package Terraform or kubectl, it prints the official
+installation page for the missing command.
+
+The Linux workstation needs:
 
 - Bash, Python 3, GNU Make, and OpenSSH
 - Terraform
@@ -35,6 +40,8 @@ name, addresses, and admin username are local inputs. Read
 ```bash
 git clone https://github.com/ffworker/cka-lab.git
 cd cka-lab
+make requirements
+make requirements-check
 cp infrastructure/proxmox/terraform.tfvars.example \
   infrastructure/proxmox/terraform.tfvars
 ```

@@ -133,9 +133,24 @@ compatibility matrix has been tested.
 
 ## Requirements
 
-Linux, Bash, Python 3, GNU Make, OpenSSH, kubectl, Terraform, Ansible, and an
-operator-managed Proxmox VE lab. Hermes Agent `>=0.21.0` is required only for
-the optional tutor.
+The workstation needs Linux, Bash, Python 3, GNU Make, OpenSSH, Git, kubectl,
+Terraform, and Ansible. From the repository root, install/check the workstation
+tools with the bundled helper:
+
+```bash
+make requirements
+make requirements-check
+```
+
+The helper supports `apt-get`, `dnf`, `pacman`, and `zypper`. It only installs
+local workstation packages. If Terraform or kubectl are not available from the
+configured distribution repositories, it prints the official installation link
+and exits without guessing at a third-party source. Hermes Agent `>=0.21.0` is
+optional and only needed for Pod-Professor; install it separately before the
+`hermes profile install` command in the [quick start](docs/QUICKSTART.md).
+
+You still need an operator-managed Proxmox VE lab. The helper does not create
+the cloud-init template, isolated bridge, pool, API token, or SSH credentials.
 
 ## License
 

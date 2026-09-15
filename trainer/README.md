@@ -1,9 +1,11 @@
 # Trainer
 
-The trainer reads `docs/cka-shared/handoff.json`, discovers scenario folders,
-and stores local progress under ignored `.cka-factory/` runtime state. Selection
-prioritizes weak and unstable topics, excludes `notYetIntroduced` topics, and
-avoids immediate repetition. Modes are `weak`, `improving`, `stable`, `mixed`,
+The trainer reads the neutral `trainer/config/learner-state.default.json`,
+discovers scenario folders, and stores personal progress under ignored
+`.cka-factory/` runtime state. The default's readiness list describes curriculum
+eligibility for the bundled missions, not an individual's assessed readiness.
+Selection prioritizes weak and unstable topics, excludes `notYetIntroduced`
+topics, and avoids immediate repetition. Modes are `weak`, `improving`, `stable`, `mixed`,
 `troubleshooting`, `timed`, `random`, and `mock-exam`.
 
 Use the repository-root Make targets. `lab-up` runs the Proxmox Terraform module,

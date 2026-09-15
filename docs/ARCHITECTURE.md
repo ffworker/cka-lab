@@ -7,7 +7,7 @@ flowchart LR
     L["Learner"] --> P["Pod-Professor\noptional tutor"]
     L --> C["Make / trainer CLI"]
     P --> C
-    S["Tracked learning state"] --> C
+    S["Generic learner-state default"] --> C
     C --> M["Scenario injector"]
     M --> K["Two-node kubeadm cluster"]
     K --> V["Scenario validator"]
@@ -19,7 +19,12 @@ flowchart LR
 
 ### Learning state
 
-`docs/cka-shared/handoff.json` is the machine-readable contract. Theory work owns topic classifications and practical readiness. Practical work owns feedback. The trainer reads this state when it selects a mission.
+`trainer/config/learner-state.default.json` is a neutral, machine-readable
+selection contract. Its `readyForPractice` list is the project-wide curriculum
+eligible for the included mission pack, not an assessment of an individual.
+Learner classifications and findings start empty; personal XP, attempts, hints,
+streaks, achievements, and mission history stay under ignored `.cka-factory/`
+runtime files.
 
 ### Trainer
 
@@ -53,7 +58,7 @@ flowchart TB
 Tracked:
 
 - scenario definitions and validators;
-- theory and practical-readiness classifications;
+- generic learner-state default and schema;
 - trainer schemas and game catalogues;
 - Terraform and Ansible source.
 

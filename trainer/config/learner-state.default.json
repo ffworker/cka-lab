@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "lastUpdated": null,
+  "sourceOfTruth": {
+    "repository": "cka-lab",
+    "learnerState": "trainer/config/learner-state.default.json",
+    "missionCatalogue": "scenarios/",
+    "progress": ".cka-factory/profile.json"
+  },
+  "theoryStatus": {
+    "weakTopics": [],
+    "improvingTopics": [],
+    "stableTopics": [],
+    "unstableConcepts": [],
+    "recentQuizFindings": []
+  },
+  "practicalFocus": {
+    "recommendedDrills": [
+      "trace Deployment -> ReplicaSet -> Pods",
+      "debug a Service with no EndpointSlices",
+      "differentiate scheduler vs kubelet from symptom patterns",
+      "repair ClusterIP and NodePort Services",
+      "practice rolling updates and rollback",
+      "schedule workloads with taints and tolerations",
+      "use ConfigMaps and Secrets as environment sources",
+      "scale a workload and verify replica convergence"
+    ],
+    "readyForPractice": [
+      "ConfigMaps",
+      "Secrets",
+      "Environment Variables",
+      "Deployments",
+      "Pods",
+      "ReplicaSets",
+      "Manual Scaling",
+      "Rolling Updates / Rollbacks",
+      "Kubernetes Components",
+      "Node Selectors",
+      "Services",
+      "Services basics",
+      "Labels and Selectors",
+      "NodePort",
+      "ClusterIP basics",
+      "NodePort basics",
+      "Taints and Tolerations"
+    ],
+    "notYetIntroduced": []
+  },
+  "practicalFeedback": {
+    "recentPracticeFindings": [],
+    "successfulTasks": [],
+    "theoryFollowupNeeded": []
+  }
+}

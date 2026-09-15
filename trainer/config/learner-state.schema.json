@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ffworker/cka-lab/blob/main/trainer/config/learner-state.schema.json",
+  "title": "CKA Lab learner state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "lastUpdated",
+    "sourceOfTruth",
+    "theoryStatus",
+    "practicalFocus",
+    "practicalFeedback"
+  ],
+  "properties": {
+    "version": { "type": "integer", "const": 1 },
+    "lastUpdated": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "format": "date-time" }
+      ]
+    },
+    "sourceOfTruth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "learnerState", "missionCatalogue", "progress"],
+      "properties": {
+        "repository": { "const": "cka-lab" },
+        "learnerState": {
+          "const": "trainer/config/learner-state.default.json"
+        },
+        "missionCatalogue": { "const": "scenarios/" },
+        "progress": { "const": ".cka-factory/profile.json" }
+      },
+      "minProperties": 4
+    },
+    "theoryStatus": { "$ref": "#/$defs/theoryStatus" },
+    "practicalFocus": { "$ref": "#/$defs/practicalFocus" },
+    "practicalFeedback": { "$ref": "#/$defs/practicalFeedback" }
+  },
+  "$defs": {
+    "stringArray": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "theoryStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "weakTopics",
+        "improvingTopics",
+        "stableTopics",
+        "unstableConcepts",
+        "recentQuizFindings"
+      ],
+      "properties": {
+        "weakTopics": { "$ref": "#/$defs/stringArray" },
+        "improvingTopics": { "$ref": "#/$defs/stringArray" },
+        "stableTopics": { "$ref": "#/$defs/stringArray" },
+        "unstableConcepts": { "$ref": "#/$defs/stringArray" },
+        "recentQuizFindings": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "practicalFocus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recommendedDrills", "readyForPractice", "notYetIntroduced"],
+      "properties": {
+        "recommendedDrills": { "$ref": "#/$defs/stringArray" },
+        "readyForPractice": { "$ref": "#/$defs/stringArray" },
+        "notYetIntroduced": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "practicalFeedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recentPracticeFindings",
+        "successfulTasks",
+        "theoryFollowupNeeded"
+      ],
+      "properties": {
+        "recentPracticeFindings": { "$ref": "#/$defs/stringArray" },
+        "successfulTasks": { "$ref": "#/$defs/stringArray" },
+        "theoryFollowupNeeded": { "$ref": "#/$defs/stringArray" }
+      }
+    }
+  }
+}

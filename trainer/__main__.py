@@ -84,7 +84,7 @@ def main() -> int:
     profile["rank"] = rank_for_xp(profile["xp"], ranks)
 
     if args.command == "status":
-        study = load_study_state(REPO / "docs/cka-shared/handoff.json")
+        study = load_study_state(REPO / "trainer/config/learner-state.default.json")
         kubeconfig = args.runtime_dir / "kubeconfig"
         cluster_status = "not provisioned"
         if kubeconfig.is_file():
@@ -110,7 +110,7 @@ def main() -> int:
     elif args.command == "profile":
         print(json.dumps(profile, indent=2))
     elif args.command == "mission":
-        study = load_study_state(REPO / "docs/cka-shared/handoff.json")
+        study = load_study_state(REPO / "trainer/config/learner-state.default.json")
         active_path = args.runtime_dir / "active-mission.json"
         if active_path.is_file():
             active = json.loads(active_path.read_text(encoding="utf-8"))
@@ -217,7 +217,12 @@ def main() -> int:
                 )
             remaining = [item for item in scenarios if item["id"] != scenario["id"]]
             if remaining:
-                recommendation = select_scenario(remaining, load_study_state(REPO / "docs/cka-shared/handoff.json"), profile, "mixed")
+                recommendation = select_scenario(
+                    remaining,
+                    load_study_state(REPO / "trainer/config/learner-state.default.json"),
+                    profile,
+                    "mixed",
+                )
                 print(f"\nNext recommendation: {recommendation['title']}")
             print("═" * 46)
         elif args.command == "hint":

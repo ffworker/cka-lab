@@ -25,11 +25,52 @@ REPO = Path(__file__).resolve().parents[2]
 
 
 def test_study_state_reader_preserves_training_inputs():
-    state = load_study_state(REPO / "docs/cka-shared/handoff.json")
-    assert state["weakTopics"]
-    assert state["improvingTopics"]
-    assert state["stableTopics"]
+    path = REPO / "trainer/config/learner-state.default.json"
+    payload = json.loads(path.read_text())
+    state = load_study_state(path)
+    assert state["readyForPractice"]
+    assert state["recommendedDrills"]
     assert "practicalFeedback" in state
+    assert payload["lastUpdated"] is None
+    assert payload["theoryStatus"]["weakTopics"] == []
+    assert payload["theoryStatus"]["improvingTopics"] == []
+    assert payload["theoryStatus"]["stableTopics"] == []
+    assert payload["theoryStatus"]["unstableConcepts"] == []
+    assert payload["theoryStatus"]["recentQuizFindings"] == []
+    assert payload["practicalFeedback"] == {
+        "recentPracticeFindings": [],
+        "successfulTasks": [],
+        "theoryFollowupNeeded": [],
+    }
+    forbidden_personal_keys = {
+        "xp",
+        "attempts",
+        "hints",
+        "hintCount",
+        "streak",
+        "achievements",
+        "missionHistory",
+        "completedMissions",
+    }
+
+    def nested_keys(value):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                yield key
+                yield from nested_keys(child)
+        elif isinstance(value, list):
+            for child in value:
+                yield from nested_keys(child)
+
+    assert forbidden_personal_keys.isdisjoint(nested_keys(payload))
+    scenarios = discover_scenarios(REPO / "scenarios")
+    curriculum = set(payload["practicalFocus"]["readyForPractice"])
+    required = {
+        item
+        for scenario in scenarios
+        for item in [scenario["topic"], *scenario["prerequisites"]]
+    }
+    assert required <= curriculum
     assert SELECTION_MODES == {
         "weak", "improving", "stable", "mixed", "troubleshooting",
         "timed", "random", "mock-exam",

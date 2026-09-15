@@ -135,12 +135,17 @@ compatibility matrix has been tested.
 
 The workstation needs Linux, Bash, Python 3, GNU Make, OpenSSH, Git, kubectl,
 Terraform, and Ansible. From the repository root, install/check the workstation
-tools with the bundled helper:
+tools and create the ignored local configuration templates with the bundled
+helper:
 
 ```bash
 make requirements
 make requirements-check
 ```
+
+The installer creates `infrastructure/proxmox/terraform.tfvars` and
+`.cka-factory/proxmox.env` when they do not exist. Edit both files with your
+local Proxmox values and token before running `make lab-up`.
 
 The helper supports `apt-get`, `dnf`, `pacman`, and `zypper`. It only installs
 local workstation packages. If Terraform or kubectl are not available from the

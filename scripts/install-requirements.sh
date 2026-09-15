@@ -3,17 +3,17 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: scripts/install-requirements.sh [--check|--install]
+Usage: scripts/install-requirements.sh [--install|--check]
 
+  --install  Install missing commands and create local runtime templates.
   --check    Report missing workstation commands without changing the system.
-  --install  Install missing commands with the detected Linux package manager.
 
 The installer covers the local workstation tools. It does not create Proxmox
 templates, pools, networks, API tokens, or SSH credentials.
 EOF
 }
 
-MODE=check
+MODE=install
 case "${1:-}" in
     "") ;;
     --check) MODE=check ;;
@@ -152,5 +152,24 @@ if [[ "$MODE" == install ]]; then
         printf '\ncka-lab requirements: still missing after installation: %s\n' "${remaining[*]}" >&2
         exit 1
     fi
+
+    repo_root=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+    runtime_dir="$repo_root/.cka-factory"
+    tfvars="$repo_root/infrastructure/proxmox/terraform.tfvars"
+    env_file="$runtime_dir/proxmox.env"
+    mkdir -p "$runtime_dir"
+    chmod 700 "$runtime_dir"
+
+    if [[ ! -e "$tfvars" ]]; then
+        cp "$repo_root/infrastructure/proxmox/terraform.tfvars.example" "$tfvars"
+        printf 'Created local Terraform configuration: %s\n' "$tfvars"
+    fi
+    chmod 600 "$tfvars"
+    if [[ ! -e "$env_file" ]]; then
+        printf '%s\n' 'TF_VAR_proxmox_api_token=cka-factory@pve!terraform=REPLACE_WITH_TOKEN_SECRET' >"$env_file"
+        chmod 600 "$env_file"
+        printf 'Created secure token template: %s\n' "$env_file"
+    fi
     printf '\ncka-lab requirements: all workstation commands are ready\n'
+    printf 'Next: edit infrastructure/proxmox/terraform.tfvars and .cka-factory/proxmox.env, then run make lab-up.\n'
 fi

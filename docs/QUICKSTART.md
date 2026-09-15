@@ -42,11 +42,10 @@ git clone https://github.com/ffworker/cka-lab.git
 cd cka-lab
 make requirements
 make requirements-check
-cp infrastructure/proxmox/terraform.tfvars.example \
-  infrastructure/proxmox/terraform.tfvars
 ```
 
-Edit the ignored `terraform.tfvars` file. Review the endpoint, Proxmox node,
+The installer creates the ignored `terraform.tfvars` and `.cka-factory/proxmox.env`
+templates. Edit the `terraform.tfvars` file. Review the endpoint, Proxmox node,
 template, datastore, and guest username, then replace every placeholder with
 values from your isolated lab network and the public SSH key that should be
 installed in the guests. The example deliberately contains no working address

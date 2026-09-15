@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -165,11 +166,18 @@ def main() -> int:
         if os.environ.get("CKA_FACTORY_DRY_RUN") == "1":
             print(f"{args.command}: factory command available (dry run)")
         else:
-            subprocess.run(
-                [REPO / "scripts/lab-factory.sh", args.command, args.runtime_dir],
-                cwd=REPO,
-                check=True,
-            )
+            try:
+                subprocess.run(
+                    [REPO / "scripts/lab-factory.sh", args.command, args.runtime_dir],
+                    cwd=REPO,
+                    check=True,
+                )
+            except subprocess.CalledProcessError as error:
+                print(
+                    f"{args.command}: factory setup stopped with exit status {error.returncode}",
+                    file=sys.stderr,
+                )
+                return error.returncode
     else:
         active_path = args.runtime_dir / "active-mission.json"
         if not active_path.is_file():

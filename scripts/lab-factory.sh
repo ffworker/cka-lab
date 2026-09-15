@@ -40,6 +40,8 @@ load_api_token() {
   local lines
   mapfile -t lines <"$ENV_FILE"
   [[ "${#lines[@]}" -eq 1 ]] || fail "$ENV_FILE must contain exactly one assignment"
+  [[ "${lines[0]}" != *REPLACE_WITH_TOKEN_SECRET* ]] ||
+    fail "replace REPLACE_WITH_TOKEN_SECRET in $ENV_FILE before running make lab-up"
   [[ "${lines[0]}" =~ ^TF_VAR_proxmox_api_token=cka-factory@pve!terraform=[A-Za-z0-9-]+$ ]] ||
     fail "$ENV_FILE contains an invalid assignment"
   export TF_VAR_proxmox_api_token="${lines[0]#TF_VAR_proxmox_api_token=}"

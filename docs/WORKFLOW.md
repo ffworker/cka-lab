@@ -2,7 +2,8 @@
 
 ## Start of every lab session
 
-1. Open `docs/cka-shared/handoff.json`
+1. Open `.cka-factory/learner-state.json` when present; otherwise use
+   `trainer/config/learner-state.default.json`
 2. Read:
    - `theoryStatus.weakTopics`
    - `theoryStatus.improvingTopics`
@@ -34,8 +35,8 @@ Ingress controller exposure -> Ingress rule -> Service -> Endpoints -> Pods
 
 ## End of every lab session
 
-Update only `practicalFeedback` and `lastUpdated` in
-`docs/cka-shared/handoff.json`:
+Update only `practicalFeedback` and `lastUpdated` in ignored local
+`.cka-factory/learner-state.json`:
 - `recentPracticeFindings`
 - `successfulTasks`
 - `theoryFollowupNeeded`

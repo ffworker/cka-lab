@@ -19,7 +19,7 @@ Priorities:
 - create lab manifests
 - run practical exercises
 - inspect objects
-- write practical findings to `docs/cka-shared/handoff.json`
+- write practical findings to ignored `.cka-factory/learner-state.json`
 
 ## System awareness
 
@@ -27,7 +27,8 @@ This is one self-contained repository. There is no operational dependency on
 an external `cka-qa` repository, `cka-shared` repository, or submodule.
 
 Before proposing or building practical work, read
-`docs/cka-shared/handoff.json` and respect:
+`.cka-factory/learner-state.json` when it exists; otherwise use the neutral
+`trainer/config/learner-state.default.json`. Respect:
 - `weakTopics`
 - `improvingTopics`
 - `stableTopics` (still eligible for spaced revision)
@@ -39,19 +40,19 @@ Before proposing or building practical work, read
 
 ## Ownership rules
 
-This repo may update:
+Personal learner state may update:
 - `practicalFeedback`
 - `lastUpdated`
 
-This repo must not overwrite:
+Practical work must not overwrite these learner-owned fields:
 - `theoryStatus`
 - `practicalFocus`
 
 ## Avoid
 
 - introducing theory topics not yet covered
-- overwriting theory ownership fields in the shared handoff
-- bypassing the shared learning-state contract
+- committing personal learner state or findings
+- bypassing the learner-state contract
 
 ## Lab rule
 

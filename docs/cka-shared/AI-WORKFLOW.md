@@ -1,12 +1,14 @@
-# AI workflow for the internal handoff
+# AI workflow for learner state
 
-The contract is `docs/cka-shared/handoff.json` inside `cka-lab`.
+Use ignored `.cka-factory/learner-state.json` when present; otherwise start from
+the neutral `trainer/config/learner-state.default.json` contract.
 
-Before editing it, determine whether the session is theory or practical work:
+Before editing local learner state, determine whether the session is theory or
+practical work:
 
 - theory may update `theoryStatus`, `practicalFocus`, and `lastUpdated`;
 - practical work may update `practicalFeedback` and `lastUpdated`.
 
 Never overwrite the other ownership area. Respect `notYetIntroduced`, retain
-stable topics for revision, and commit the change once in this repository.
-There is no external handoff repository or submodule workflow.
+stable topics for revision, and keep individual updates local and uncommitted.
+There is no external learner-state repository or submodule workflow.

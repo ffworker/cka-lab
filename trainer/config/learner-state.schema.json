@@ -27,7 +27,10 @@
       "properties": {
         "repository": { "const": "cka-lab" },
         "learnerState": {
-          "const": "trainer/config/learner-state.default.json"
+          "enum": [
+            "trainer/config/learner-state.default.json",
+            ".cka-factory/learner-state.json"
+          ]
         },
         "missionCatalogue": { "const": "scenarios/" },
         "progress": { "const": ".cka-factory/profile.json" }

@@ -4,7 +4,8 @@ CKA Lab treats practical fluency as the result of repeated build, inspect, break
 
 ## The loop
 
-1. The trainer reads `docs/cka-shared/handoff.json`.
+1. The trainer reads ignored `.cka-factory/learner-state.json` when present,
+   otherwise the neutral `trainer/config/learner-state.default.json`.
 2. It excludes `notYetIntroduced` topics.
 3. It prioritizes weak and unstable areas, with occasional stable-topic revision.
 4. It avoids selecting the exact same scenario twice in a row.
@@ -21,7 +22,8 @@ The default experience is not a broad quiz. Pod-Professor waits for an attempt, 
 
 ## Learning-state ownership
 
-The tracked handoff has two ownership areas:
+The learner-state contract has two ownership areas. Individual updates belong
+only in ignored `.cka-factory/learner-state.json`:
 
 - theory work updates `theoryStatus` and `practicalFocus`;
 - practical work updates `practicalFeedback`.

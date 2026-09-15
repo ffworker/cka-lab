@@ -43,16 +43,16 @@ and explaining the component boundary back in plain language.
 
 ## Troubleshooting Diagrams
 
-Network troubleshooting diagrams are embedded here and stored as SVG in `DEMO/troubleshoot/`.
+Network troubleshooting diagrams are embedded here and stored as SVG in `human-notes/troubleshoot/`.
 
 ### Phase 1-2
-![Kubernetes Network Troubleshooting Phase 1-2](DEMO/troubleshoot/k8s_network_ts_phase1_2.svg)
+![Kubernetes Network Troubleshooting Phase 1-2](human-notes/troubleshoot/k8s_network_ts_phase1_2.svg)
 
 ### Phase 3-4
-![Kubernetes Network Troubleshooting Phase 3-4](DEMO/troubleshoot/k8s_network_ts_phase3_4.svg)
+![Kubernetes Network Troubleshooting Phase 3-4](human-notes/troubleshoot/k8s_network_ts_phase3_4.svg)
 
 ### Phase 5-6
-![Kubernetes Network Troubleshooting Phase 5-6](DEMO/troubleshoot/k8s_network_ts_phase5_6.svg)
+![Kubernetes Network Troubleshooting Phase 5-6](human-notes/troubleshoot/k8s_network_ts_phase5_6.svg)
 
 ## Suggested GitHub Topics
 

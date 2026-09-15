@@ -10,6 +10,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+      - name: Run trainer tests
+        run: |
+          python -m pip install --disable-pip-version-check pytest
+          python -m pytest -q
       - name: Validate JSON and shell scripts
         run: |
           python - <<'PY'

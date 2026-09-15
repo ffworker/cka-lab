@@ -1,9 +1,10 @@
 # Trainer
 
-The trainer reads the neutral `trainer/config/learner-state.default.json`,
-discovers scenario folders, and stores personal progress under ignored
-`.cka-factory/` runtime state. The default's readiness list describes curriculum
-eligibility for the bundled missions, not an individual's assessed readiness.
+The trainer prefers ignored `.cka-factory/learner-state.json` and falls back to
+the neutral `trainer/config/learner-state.default.json`. It discovers scenario
+folders and stores personal progress under ignored `.cka-factory/` runtime
+state. The default's readiness list describes curriculum eligibility for the
+bundled missions, not an individual's assessed readiness.
 Selection prioritizes weak and unstable topics, excludes `notYetIntroduced`
 topics, and avoids immediate repetition. Modes are `weak`, `improving`, `stable`, `mixed`,
 `troubleshooting`, `timed`, `random`, and `mock-exam`.

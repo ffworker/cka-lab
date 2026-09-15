@@ -13,7 +13,8 @@ Use this repo as the practical IDE workspace tied to GitHub.
 
 ## Important
 
-The IDE agent should read `docs/cka-shared/handoff.json` before suggesting drills.
+The IDE agent should read ignored `.cka-factory/learner-state.json` when it
+exists; otherwise it should use `trainer/config/learner-state.default.json`.
 
 ## Good prompts in the IDE
 
@@ -24,7 +25,7 @@ The IDE agent should read `docs/cka-shared/handoff.json` before suggesting drill
 
 ## Avoid prompts
 
-- teach me entirely new theory topics not in the handoff
+- teach me entirely new theory topics outside the learner-state contract
 - ignore the notYetIntroduced list
 
 ## Input review loop (for coaching mode)
@@ -48,4 +49,4 @@ When you want the IDE assistant to review your work and guide you step-by-step:
 
 Suggested prompt:
 
-`Use docs/cka-shared/handoff.json and run a strict checkpoint coaching loop. I will paste output after each step. Correct me immediately and continue only when the current checkpoint is correct.`
+`Use .cka-factory/learner-state.json when present, otherwise the neutral tracked default, and run a strict checkpoint coaching loop. I will paste output after each step. Correct me immediately and continue only when the current checkpoint is correct.`

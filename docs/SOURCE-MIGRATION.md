@@ -11,5 +11,5 @@ migration commits; the working tree is now organized by purpose.
 - `notes/`: troubleshooting guides and kubectl cheatsheets.
 - `exercises/`: practical build/break/fix drills.
 - `labs/debug-labs/`: Docker/debug learning labs and reports.
-- `docs/cka-shared/`: inlined handoff state and workflow guidance.
+- `docs/cka-shared/`: inlined learner-state workflow guidance.
 - `scripts/`: small helper scripts for the learning workspace.

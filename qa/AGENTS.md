@@ -18,17 +18,18 @@ Priorities:
 - topic updates
 - study status
 - recording quiz findings
-- writing theory state to `docs/cka-shared/handoff.json`
+- writing individual theory state to ignored `.cka-factory/learner-state.json`
 
 ## System awareness
 
 This directory is part of the self-contained `cka-lab` repository. Theory and
 recall live in `qa/`; practical training lives in `labs/`, `exercises/`, and
-future `scenarios/` and `trainer/`; the learning-state contract lives at
-`docs/cka-shared/handoff.json`.
+future `scenarios/` and `trainer/`; the neutral learning-state contract lives
+at `trainer/config/learner-state.default.json`, while individual state stays in
+ignored `.cka-factory/learner-state.json`.
 
-When theory findings change, update the internal handoff so practical training
-can target the right drills.
+When individual theory findings change, update only the ignored local learner
+state so practical training can target the right drills.
 
 ## Ownership rules
 

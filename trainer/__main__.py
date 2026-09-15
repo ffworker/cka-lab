@@ -77,6 +77,9 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_parser().parse_args()
     profile = load_or_create_profile(args.runtime_dir)
+    study_path = args.runtime_dir / "learner-state.json"
+    if not study_path.is_file():
+        study_path = REPO / "trainer/config/learner-state.default.json"
     scenario_root = Path(os.environ.get("CKA_TRAINER_SCENARIO_ROOT", REPO / "scenarios"))
     scenarios = discover_scenarios(scenario_root)
     ranks = load_catalogue(REPO / "trainer/config/ranks.json", "ranks")
@@ -84,7 +87,7 @@ def main() -> int:
     profile["rank"] = rank_for_xp(profile["xp"], ranks)
 
     if args.command == "status":
-        study = load_study_state(REPO / "trainer/config/learner-state.default.json")
+        study = load_study_state(study_path)
         kubeconfig = args.runtime_dir / "kubeconfig"
         cluster_status = "not provisioned"
         if kubeconfig.is_file():
@@ -110,7 +113,7 @@ def main() -> int:
     elif args.command == "profile":
         print(json.dumps(profile, indent=2))
     elif args.command == "mission":
-        study = load_study_state(REPO / "trainer/config/learner-state.default.json")
+        study = load_study_state(study_path)
         active_path = args.runtime_dir / "active-mission.json"
         if active_path.is_file():
             active = json.loads(active_path.read_text(encoding="utf-8"))
@@ -219,7 +222,7 @@ def main() -> int:
             if remaining:
                 recommendation = select_scenario(
                     remaining,
-                    load_study_state(REPO / "trainer/config/learner-state.default.json"),
+                    load_study_state(study_path),
                     profile,
                     "mixed",
                 )

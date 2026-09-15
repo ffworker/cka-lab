@@ -1,6 +1,9 @@
-# QA to Shared Handoff Rules
+# QA learner-state ownership rules
 
-Update `docs/cka-shared/handoff.json` whenever one of these changes:
+Update ignored `.cka-factory/learner-state.json` whenever an individual's
+assessment changes. Keep `trainer/config/learner-state.default.json` neutral.
+
+The local learner state owns:
 - weak topics
 - improving topics
 - stable topics

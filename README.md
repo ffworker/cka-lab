@@ -1,257 +1,144 @@
 # CKA Lab
 
-> Break Kubernetes on purpose.<br>
-> Fix it under pressure.<br>
+> **Break Kubernetes on purpose.**<br>
+> **Fix it under pressure.**<br>
 > Level up until the exam feels boring.
 
-CKA Lab is a practical-first Kubernetes training system. It provisions a small,
-disposable kubeadm cluster, injects break/fix missions, validates the live
-cluster state, and tracks progress locally. A repo-owned AI tutor called
-Pod-Professor can run the loop with you without blurting out the answer.
+[![Validate learning workspace](https://github.com/ffworker/cka-lab/actions/workflows/learning-validate.yml/badge.svg)](https://github.com/ffworker/cka-lab/actions/workflows/learning-validate.yml)
 
-```text
-╔══════════════════════════════════════╗
-║          INCIDENT INCOMING           ║
-╚══════════════════════════════════════╝
+CKA Lab is a practical-first Kubernetes training system. Terraform and Ansible
+build a disposable two-node kubeadm cluster on Proxmox; eight break/fix missions
+inject faults, validate the live Kubernetes API, and award local XP. An optional
+AI tutor, Pod-Professor, coaches without revealing the answer immediately.
 
-Cluster:    disposable
-Mode:       troubleshooting
-Hints:      0
-Rank:       YAML Goblin
-Objective:  fix what broke
-```
+**Kubernetes · Proxmox · Terraform · Ansible · kubeadm · Python · Bash**
 
-This is original, exam-style practice. It does not contain leaked or
-proprietary exam questions.
-
-## Why practical-first?
-
-Kubernetes knowledge gets useful when you can move from symptom to object to
-root cause under time pressure. CKA Lab makes that the default loop:
-
-1. receive a concrete objective;
-2. inspect and repair real cluster objects with `kubectl` or YAML;
-3. validate the resulting cluster state;
-4. request progressively stronger hints only when needed;
-5. collect XP and move to the next weak spot.
-
-Theory is still here, but it supports the terminal work instead of replacing
-it.
-
-## What makes it different
-
-| Part | What it does |
-| --- | --- |
-| Disposable factory | Terraform and Ansible build a two-node kubeadm lab on Proxmox. |
-| Real validators | Missions pass only when the Kubernetes API shows the required state. |
-| Pod-Professor | A practical-first tutor presents missions, reads output, and coaches without immediate spoilers. |
-| Adaptive selection | The trainer reads the tracked learning-state contract and prioritizes weak or unstable topics. |
-| Local progression | XP, attempts, hints, streaks, ranks, and achievements stay in ignored runtime files. |
-| Safe teardown | The factory refuses teardown unless Terraform state and live VM ownership match its exact two-VM boundary. |
+> This is an operator-owned lab, not a hosted sandbox. You need a Linux
+> workstation, Proxmox VE, a cloud-init template, an isolated bridge, and a
+> scoped API token. The current backend is deliberately opinionated.
 
 ## Quick start
 
-The current lab backend is opinionated: you need a Linux workstation, a
-Proxmox VE host, a suitable cloud-init template, an isolated bridge, and a
-scoped API token before `make lab-up` can work. A random clone is not
-zero-configuration.
+First complete the [Proxmox setup guide](docs/QUICKSTART.md), including the
+cloud-init template, isolated bridge, scoped API token, and ignored local input
+files. Then:
 
 ```bash
 git clone https://github.com/ffworker/cka-lab.git
 cd cka-lab
-
-# Follow the Proxmox prerequisites and create ignored local configuration.
 cp infrastructure/proxmox/terraform.tfvars.example \
   infrastructure/proxmox/terraform.tfvars
 
-# After filling the placeholders and creating the local token file:
+# Configure the documented Proxmox inputs and local token file first.
 make lab-up
-make status
+make mission
+make validate
 ```
 
-Install the optional Pod-Professor Hermes profile:
+The guide also documents the fixed factory boundaries and safe teardown checks.
+
+Optional tutor:
 
 ```bash
 hermes profile install ./agents/pod-professor/hermes --alias
 pod-professor chat
+# Say: Start a mission
 ```
 
-Then say: `Start a mission`.
+## The system loop
 
-Read [the full quick start](docs/QUICKSTART.md) before provisioning. It lists
-the fixed factory assumptions, required tools, secret-file format, and cleanup
-behavior.
+```mermaid
+flowchart LR
+    subgraph F["Disposable lab factory"]
+        T["Terraform<br/>VM lifecycle"] --> P["Proxmox VE<br/>two guests"]
+        P --> A["Ansible<br/>OS + Kubernetes"]
+        A --> K["kubeadm cluster<br/>control plane + worker"]
+    end
 
-## A mission in motion
-
-```text
-make mission
-    ↓
-MISSION: Endpoints Were Inside You All Along
-    ↓
-work with kubectl / YAML
-    ↓
-make validate ── FAIL ──→ make hint ──→ keep working
-    │
-   PASS
-    ↓
-XP + achievements + rank progress + next recommendation
-    ↓
-make reset
+    L["Learner"] --> R["Trainer CLI"]
+    Q["Pod-Professor<br/>optional tutor"] --> R
+    R --> I["Mission injector"]
+    I --> K
+    K --> V["Live-state validator"]
+    V --> S["Local XP, rank<br/>and next mission"]
+    S --> R
 ```
 
-The first pack contains eight hands-on missions:
+## What this demonstrates
+
+| Engineering decision | Implementation |
+| --- | --- |
+| Disposable infrastructure | Terraform owns exactly two factory guests; rebuild and teardown are normal operations. |
+| Clear automation boundaries | Terraform owns VM lifecycle. Ansible owns containerd, kubeadm, Flannel, and node configuration. |
+| Validation over checklists | Missions pass only when validators observe the required state through Kubernetes. |
+| State discipline | The neutral tracked default is the fallback; an ignored `.cka-factory/learner-state.json` drives personalized eligibility when present, while progress stays local. |
+| Fail-closed teardown | Destruction is refused unless Terraform state and live Proxmox ownership metadata agree on the exact two-VM boundary. |
+| Practical tutor design | Pod-Professor uses the trainer loop, gives progressive hints, and does not own or repair the hypervisor. |
+| Testable tooling | GitHub Actions runs the trainer pytest suite and validates tracked JSON and shell syntax on pushes and pull requests. |
+
+## Mission pack
 
 | Mission | Pressure point |
 | --- | --- |
 | The Replica Trail | Deployment → ReplicaSet → Pods |
 | Endpoints Were Inside You All Along | Service selectors and EndpointSlices |
-| The Placement–Runtime Divide | scheduler versus kubelet symptoms |
+| The Placement–Runtime Divide | Scheduler versus kubelet symptoms |
 | Two Doors, One Backend | ClusterIP and NodePort repair |
-| Release the Kraken, Then Roll It Back | rolling updates and rollback |
-| The Dedicated Node | taints and tolerations |
+| Release the Kraken, Then Roll It Back | Rolling updates and rollback |
+| The Dedicated Node | Taints and tolerations |
 | Configuration Has Left the Container | ConfigMap, Secret, and environment injection |
-| Four Pods, No More, No Less | manual scaling and replica convergence |
+| Four Pods, No More, No Less | Manual scaling and replica convergence |
 
-The catalogue lives in [`scenarios/`](scenarios/).
+Each scenario owns metadata, an injector, a live-state validator, a reset script,
+two progressive hints, and an explicit solution. Browse the
+[`scenarios/`](scenarios/) catalogue.
 
-The trainer hides solutions during normal play; it does not encrypt them. This
-is a public repository, so a determined learner can still open a scenario's
-`solution.md` directly.
-
-## Pod-Professor
-
-Pod-Professor is the learner-facing tutor. Its behavior, teaching rules, and
-Hermes distribution all live under [`agents/pod-professor/`](agents/pod-professor/).
-
-It prefers practical work, reveals two hints in order, waits for an explicit
-solution request, and uses trainer-owned progress instead of inventing another
-scoreboard. Private Hermes memory and sessions stay in the installed local
-profile. The tracked repository learning state remains authoritative.
-
-Pod-Professor consumes `make lab-up`, trainer commands, and kubectl-visible
-state. If the Proxmox factory itself breaks, infrastructure repair belongs to a
-main infrastructure agent outside the tutor session.
-
-More: [Pod-Professor guide](docs/POD-PROFESSOR.md).
-
-## Disposable Proxmox lab
-
-The implemented backend creates exactly two VMs:
-
-```text
-Proxmox VE host
-└── cka-factory pool
-    ├── cka-cp01      control plane, 2 vCPU, 2 GiB
-    └── cka-worker01  worker,        1 vCPU, 2 GiB
-```
-
-Terraform clones a pre-existing cloud-init template. Ansible installs
-containerd and Kubernetes packages, runs `kubeadm init`, installs pinned
-Flannel, joins the worker, and fetches kubeconfig. Runtime credentials,
-inventory, state, host keys, kubeconfig, and learner progress are ignored by
-Git.
-
-This backend is working, but it is not generic. It currently expects fixed VM
-IDs, pool, bridge, SSH alias, and Linux command-line tooling. The template,
-datastore, guest addresses, and admin username are local inputs. See
-[the factory guide](docs/PROXMOX-FACTORY.md) before adapting it.
-
-## Learner workflow
-
-```mermaid
-flowchart TD
-    U["Learner"] --> P["Pod-Professor"]
-    P --> T["Trainer + learning state"]
-    T --> M["Selected mission"]
-    M --> K["Disposable Kubernetes cluster"]
-    K --> V["Live-state validator"]
-    V -->|PASS| G["XP, achievements, rank, feedback"]
-    V -->|FAIL| H["Retry or progressive hint"]
-    H --> K
-    G --> T
-```
-
-The machine-readable handoff separates theory-owned fields from practical
-feedback. Scenario selection excludes topics marked `notYetIntroduced`, avoids
-immediate repetition, and uses simple deterministic priorities rather than a
-complex recommendation engine.
-
-More: [architecture](docs/ARCHITECTURE.md) and [training model](docs/TRAINING-MODEL.md).
-
-## Gamification
-
-The rank path is defined in [`trainer/config/ranks.json`](trainer/config/ranks.json):
-
-```text
-YAML Goblin → Pod Whisperer → CrashLoop Exorcist → DNS Detective
-→ RBAC Sheriff → Scheduler Sorcerer → etcd Necromancer
-→ Control Plane Commander
-```
-
-Existing achievements reward no-hint completions, first-attempt wins, timely
-finishes, reset-and-recovery, study streaks, and ten completed missions. All
-progress is local to the user under `.cka-factory/` and is never committed.
-
-More: [gamification rules and thresholds](docs/GAMIFICATION.md).
-
-## Repository map
-
-| Path | Owns |
-| --- | --- |
-| [`agents/`](agents/) | Pod-Professor behavior and the Hermes profile adapter. |
-| [`ansible/`](ansible/) | containerd, kubeadm, CNI, control-plane, and worker bootstrap. |
-| [`infrastructure/`](infrastructure/) | Terraform for disposable Proxmox guests. |
-| [`scenarios/`](scenarios/) | mission metadata, injection, validation, reset, hints, and solutions. |
-| [`trainer/`](trainer/) | mission selection, timers, profile state, XP, ranks, and achievements. |
-| [`exercises/`](exercises/) | guided practical drills outside the mission runner. |
-| [`qa/`](qa/) | theory, recall, current focus, and theory-owned learner state. |
-| [`docs/`](docs/) | public guides plus the internal learning-state handoff. |
-| [`scripts/`](scripts/) | safe factory lifecycle and handoff helpers. |
-
-## Requirements
-
-| Layer | Current requirement |
-| --- | --- |
-| Local machine | Linux, Bash, Python 3, GNU Make, OpenSSH, kubectl, Terraform, and Ansible. |
-| Virtualization | Proxmox VE with a cloud-init template, storage, an isolated bridge, and free factory VM IDs. |
-| Tutor | Hermes Agent `>=0.21.0` for the shipped Pod-Professor adapter. The CLI trainer works without the tutor. |
-| Network | The workstation must reach Proxmox; Proxmox must route the isolated lab network for package installation. |
-
-The repository currently pins Kubernetes `v1.37` and Flannel `v0.28.8` in the
-factory-generated inventory. No broader compatibility matrix has been tested.
-
-## Commands
+## Training commands
 
 | Command | Result |
 | --- | --- |
-| `make lab-up` | Provision or reconcile the two-node lab and wait for Ready. |
-| `make status` | Show factory, cluster, scenario, and study-state status. |
-| `make mission` | Select, inject, and start a mission timer. |
+| `make lab-up` | Provision or reconcile the lab and wait for both nodes to become Ready. |
+| `make status` | Show factory, cluster, scenario, and local study state. |
+| `make mission` | Select and inject a mission, then start its timer. |
 | `make validate` | Check live state and record an attempt. |
 | `make hint` | Reveal the next of two hints. |
 | `make solution` | Show the solution only when explicitly requested. |
-| `make reset` | Restore an active mission or clean a completed one. |
+| `make reset` | Restore the active mission safely. |
 | `make profile` | Show local XP, rank, streaks, achievements, and history. |
-| `make lab-down` | Destroy only the exact factory-owned VMs. |
+| `make lab-down` | Destroy only the exact factory-owned VMs after ownership checks pass. |
 
 ## Project status
 
-| Status | Area |
-| --- | --- |
-| ✅ Working | Two-node Proxmox factory, kubeadm bootstrap, Flannel, eight missions, live validators, trainer profile, and Pod-Professor Hermes adapter. |
-| 🧪 Experimental | Public installation outside the original Proxmox environment; the backend is deliberately opinionated and manually configured. |
-| 🧪 Experimental | Selection modes beyond the default loop; they are accepted by the CLI but are not a full mock-exam engine. |
-| 🚧 Planned | Broader CKA mission coverage, more troubleshooting scenarios, richer learner analytics, and additional tutor or infrastructure adapters. |
+- **Working:** two-node Proxmox factory, kubeadm bootstrap, Flannel, eight
+  missions, live validators, local progression, and the Pod-Professor adapter.
+- **Environment-bound:** public installation requires adapting documented local
+  inputs around the intentionally fixed safety boundaries.
+- **Study mode:** feature development is frozen unless something is broken. The
+  project is returning to active CKA practice, not another architecture cycle.
+- **Scope:** original exam-style practice only—no leaked or proprietary exam
+  questions.
 
-## Contributing
+The factory currently pins Kubernetes `v1.37` and Flannel `v0.28.8`. No broader
+compatibility matrix has been tested.
 
-Mission fixes, safer factory behavior, and focused scenario additions are
-welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a change. Please
-report security problems through [SECURITY.md](SECURITY.md), not a public issue.
+## Deeper documentation
+
+- [Quick start](docs/QUICKSTART.md)
+- [Architecture and state boundaries](docs/ARCHITECTURE.md)
+- [Proxmox factory and teardown safety](docs/PROXMOX-FACTORY.md)
+- [Training model](docs/TRAINING-MODEL.md)
+- [Gamification](docs/GAMIFICATION.md)
+- [Pod-Professor](docs/POD-PROFESSOR.md)
+- [Contributing](CONTRIBUTING.md) and [security reporting](SECURITY.md)
+
+## Requirements
+
+Linux, Bash, Python 3, GNU Make, OpenSSH, kubectl, Terraform, Ansible, and an
+operator-managed Proxmox VE lab. Hermes Agent `>=0.21.0` is required only for
+the optional tutor.
 
 ## License
 
-This repository does not currently include a repository-wide license. Until one
-is selected, the contents are visible source but are not licensed for reuse,
-redistribution, or modification. Individual files may state their own license.
+This repository does not currently include a repository-wide license. Until
+one is selected, the source is publicly visible but not licensed for reuse,
+redistribution, or modification.

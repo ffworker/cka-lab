@@ -28,7 +28,8 @@ pod-professor chat
 
 Phrases such as `practice`, `mission`, `let's train`, `CKA task`, `hands on`, and `continue` send Pod-Professor into the trainer loop. It:
 
-1. reads the tracked learning state and local trainer profile;
+1. reads ignored local learner state when present, otherwise the neutral
+   tracked default, plus the local trainer profile;
 2. checks cluster status;
 3. uses `make lab-up` only when the lab is absent;
 4. starts or resumes a mission;

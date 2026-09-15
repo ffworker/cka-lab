@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">CKA Lab social preview</title>
+  <desc id="desc">Break Kubernetes on purpose. Fix it under pressure.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="1" stop-color="#111d32"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" rx="28" fill="url(#background)"/>
+  <rect x="64" y="68" width="8" height="504" rx="4" fill="#326ce5"/>
+
+  <text x="112" y="162" fill="#7fa8ff" font-family="Inter, Segoe UI, sans-serif" font-size="30" font-weight="700" letter-spacing="7">CKA LAB</text>
+  <text x="112" y="268" fill="#f8fafc" font-family="Inter, Segoe UI, sans-serif" font-size="54" font-weight="800">BREAK KUBERNETES</text>
+  <text x="112" y="334" fill="#f8fafc" font-family="Inter, Segoe UI, sans-serif" font-size="54" font-weight="800">ON PURPOSE.</text>
+  <text x="112" y="422" fill="#7fa8ff" font-family="Inter, Segoe UI, sans-serif" font-size="42" font-weight="750">FIX IT UNDER PRESSURE.</text>
+  <text x="112" y="524" fill="#a9b7cc" font-family="Inter, Segoe UI, sans-serif" font-size="25" font-weight="500">Kubernetes · Proxmox · Terraform · Ansible</text>
+
+  <g transform="translate(1015 315)" stroke="#7fa8ff" stroke-width="5" fill="#0d1728" filter="url(#glow)">
+    <line x1="0" y1="-104" x2="-92" y2="58"/>
+    <line x1="0" y1="-104" x2="92" y2="58"/>
+    <line x1="-92" y1="58" x2="92" y2="58"/>
+    <circle cx="0" cy="-104" r="40"/>
+    <circle cx="-92" cy="58" r="40"/>
+    <circle cx="92" cy="58" r="40"/>
+  </g>
+  <g fill="#f8fafc" font-family="Inter, Segoe UI, sans-serif" font-size="18" font-weight="700" text-anchor="middle">
+    <text x="1015" y="218">CONTROL</text>
+    <text x="923" y="379">MISSION</text>
+    <text x="1107" y="379">VALIDATE</text>
+  </g>
+</svg>

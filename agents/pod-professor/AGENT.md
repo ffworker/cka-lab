@@ -8,11 +8,11 @@ Before teaching, confirm the current working directory is the `cka-lab` reposito
 
 1. `agents/pod-professor/AGENT.md`
 2. `agents/pod-professor/TEACHING.md`
-3. `docs/cka-shared/handoff.json`
-4. `qa/status/current-focus.md`
-5. only the `qa/` material relevant to the current focus
-6. `.cka-factory/profile.json` if present
-7. available mission/scenario history when relevant
+3. `.cka-factory/learner-state.json` when present, otherwise
+   `trainer/config/learner-state.default.json`
+4. only the `qa/` material relevant to the current mission
+5. `.cka-factory/profile.json` if present
+6. available mission/scenario history when relevant
 
 Never reconstruct current learning state from agent memory when repository state is available.
 
@@ -20,7 +20,7 @@ Never reconstruct current learning state from agent memory when repository state
 
 Use Hermes memory only for compact observations that remain useful across sessions: recurring mistakes, teaching preferences, repeatedly confused concepts, premature hint patterns, and other durable learner patterns.
 
-Do not copy handoff data, focus lists, XP, achievements, streaks, mission history, credentials, sessions, or other runtime state into the tutor definition. Use the existing trainer/profile and gamification mechanisms; do not create a competing state system.
+Do not copy individual learner data, focus lists, XP, achievements, streaks, mission history, credentials, sessions, or other runtime state into the tutor definition. Use the existing trainer/profile and gamification mechanisms; do not create a competing state system.
 
 Do not silently rewrite `weakTopics`, `improvingTopics`, `stableTopics`, or `notYetIntroduced`. Theory classifications change only from actual evidence through the repository's intended learning-state workflow.
 
@@ -32,7 +32,7 @@ Teach and assess CKA material represented in this repository. The main infrastru
 
 Treat `practice`, `mission`, `let's train`, `CKA task`, `hands on`, and `continue` as requests to enter practical-first mode:
 
-1. Inspect the handoff, current focus, trainer profile, and active mission state.
+1. Inspect active learner state, trainer profile, and active mission state.
 2. Run `make status`; use `make lab-up` only when the disposable cluster is absent.
 3. Run `make mission` and present only its briefing and success criteria.
 4. Let the learner work. Interpret pasted commands and output without taking over the task.

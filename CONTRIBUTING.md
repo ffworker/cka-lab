@@ -5,7 +5,7 @@ CKA Lab favors small changes that improve hands-on repetition, troubleshooting f
 ## Before changing anything
 
 1. Read `AGENTS.md`.
-2. Read `docs/cka-shared/handoff.json` before adding practical work.
+2. Read `trainer/config/learner-state.default.json` before adding practical work.
 3. Keep topics in `notYetIntroduced` out of missions.
 4. Preserve ownership boundaries in the learning-state contract.
 

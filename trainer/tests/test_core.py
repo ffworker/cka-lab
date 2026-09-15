@@ -77,6 +77,40 @@ def test_study_state_reader_preserves_training_inputs():
     }
 
 
+def test_cli_prefers_ignored_local_learner_state(tmp_path):
+    default_path = REPO / "trainer/config/learner-state.default.json"
+    payload = json.loads(default_path.read_text())
+    payload["theoryStatus"]["weakTopics"] = ["Deployments"]
+    (tmp_path / "learner-state.json").write_text(json.dumps(payload) + "\n")
+
+    result = subprocess.run(
+        [sys.executable, "-m", "trainer", "--runtime-dir", str(tmp_path), "status"],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+        check=False,
+        env={**os.environ, "CKA_FACTORY_DRY_RUN": "1"},
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "weak: 1" in result.stdout
+
+
+def test_cli_uses_neutral_default_without_creating_local_state(tmp_path):
+    result = subprocess.run(
+        [sys.executable, "-m", "trainer", "--runtime-dir", str(tmp_path), "status"],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+        check=False,
+        env={**os.environ, "CKA_FACTORY_DRY_RUN": "1"},
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "weak: 0" in result.stdout
+    assert not (tmp_path / "learner-state.json").exists()
+
+
 def test_scenario_contract_discovery(tmp_path):
     scenario = {
         "id": "contract-check",

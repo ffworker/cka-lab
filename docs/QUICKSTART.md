@@ -69,6 +69,17 @@ template, use the configured storage and `vmbr1`, read guest-agent data, and
 manage guests in the `cka-factory` pool. Token and ACL creation are currently
 operator-managed; the repository does not automate them.
 
+To keep individual study state local, optionally create a personal copy of the
+neutral curriculum baseline:
+
+```bash
+cp trainer/config/learner-state.default.json \
+  .cka-factory/learner-state.json
+```
+
+The trainer prefers this ignored local file when it exists and otherwise uses
+the tracked neutral default.
+
 ## 3. Provision the cluster
 
 ```bash

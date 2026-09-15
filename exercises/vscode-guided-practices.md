@@ -1,4 +1,4 @@
-# VS Code Guided Hands-on Practices (from `handoff.json`)
+# VS Code Guided Hands-on Practices
 
 This practice pack is derived from:
 
@@ -7,7 +7,7 @@ This practice pack is derived from:
 - `practicalFocus.recommendedDrills`
 - `practicalFocus.notYetIntroduced`
 
-Source file: `docs/cka-shared/handoff.json`.
+Source file: `trainer/config/learner-state.default.json`.
 
 ---
 
@@ -192,7 +192,7 @@ kubectl expose deployment shop --name shop-nodeport --port=80 --type=NodePort
 
 ---
 
-## Session wrap-up template (write back to shared handoff)
+## Session wrap-up template (write to ignored local learner state)
 
 After completing any drill, collect practical findings and update:
 - `practicalFeedback.recentPracticeFindings`

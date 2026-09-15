@@ -108,9 +108,12 @@ The goal is CKA exam readiness first. Vendor-specific tools, shortcuts, and
 personal experiments are separate from the main study path unless explicitly
 chosen.
 
-## Internal handoff
+## Learner-state contract
 
-Theory state is written to `docs/cka-shared/handoff.json` in this repository.
+Individual theory state is written to ignored
+`.cka-factory/learner-state.json`. The tracked
+`trainer/config/learner-state.default.json` remains a neutral curriculum
+baseline.
 
 ## Core commands in chat
 
@@ -119,9 +122,10 @@ Theory state is written to `docs/cka-shared/handoff.json` in this repository.
 - `Repeat`
 - `Update <topic>`
 
-## Source of learning truth
+## Theory guidance and active state
 
-The `qa/` area is the source of truth for:
+The `qa/` area defines the theory and recall workflow. The active ignored
+learner-state file records the individual's:
 - weak topics
 - improving topics
 - stable topics
@@ -131,11 +135,12 @@ The `qa/` area is the source of truth for:
 ## Workflow
 
 1. theory and recall work happens in `qa/`
-2. results are written into `docs/cka-shared/handoff.json`
+2. individual results are written into ignored `.cka-factory/learner-state.json`
 3. practical work in this repository derives from those results
 4. practical findings return through `practicalFeedback`
 
-If theory changes but the shared handoff is not updated, the lab will drift.
+If theory changes but ignored local learner state is not updated, personalized
+practical selection will drift.
 
 ## AI agents
 
@@ -144,4 +149,5 @@ Any future AI agent working in `qa/` must read:
 - repository-root `AGENTS.md`
 - `qa/AI-WORKFLOW.md`
 - `qa/AGENTS.md`
-- `docs/cka-shared/handoff.json`
+- `.cka-factory/learner-state.json` when present, otherwise
+  `trainer/config/learner-state.default.json`

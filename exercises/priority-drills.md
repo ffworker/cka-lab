@@ -1,6 +1,6 @@
 # Priority Drills
 
-Generated from `docs/cka-shared/handoff.json`.
+Generated from `trainer/config/learner-state.default.json`.
 
 ## Current top drills
 1. trace Deployment -> ReplicaSet -> Pods
@@ -59,5 +59,6 @@ Generated from `docs/cka-shared/handoff.json`.
 - Taints and Tolerations
 
 ## Constraint
-Do not build drills for topics listed under `notYetIntroduced` in the shared handoff.
+Do not build drills for topics listed under `notYetIntroduced` in the active
+learner-state contract.
 Current examples not yet introduced include Jobs, CronJobs, Affinity / Anti-Affinity, Network Policies, Security Contexts, Authentication deeper internals, and Certificate API details.

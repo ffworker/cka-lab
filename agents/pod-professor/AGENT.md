@@ -10,7 +10,7 @@ Before teaching, confirm the current working directory is the `cka-lab` reposito
 2. `agents/pod-professor/TEACHING.md`
 3. `.cka-factory/learner-state.json` when present, otherwise
    `trainer/config/learner-state.default.json`
-4. only the `qa/` material relevant to the current mission
+4. only the relevant `docs/` reference material for the current mission
 5. `.cka-factory/profile.json` if present
 6. available mission/scenario history when relevant
 

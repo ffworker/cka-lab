@@ -1,92 +1,92 @@
 # Proxmox factory
 
-The current infrastructure backend is a working but opinionated two-node Proxmox VE factory. It is safe because its ownership boundary is fixed and checked, not because it can discover arbitrary infrastructure.
+The Proxmox infrastructure implementation is maintained in the public
+[`ffworker/proxmox-lab`](https://github.com/ffworker/proxmox-lab) repository and
+pinned here as `vendor/proxmox-lab`.
 
-## Fixed shape
+CKA Lab keeps only a narrow compatibility adapter at
+`scripts/lab-factory.sh`. The learner-facing commands remain:
 
-| Resource | Current value |
+```bash
+make lab-up
+make lab-down
+```
+
+Set `PROXMOX_LAB_ROOT` to an absolute local checkout path only when developing
+both repositories side by side. Otherwise the adapter uses the pinned submodule.
+It accepts no arbitrary scenario path.
+
+## Fixed ownership boundary
+
+The delegated `scenarios/cka-kubernetes-proxmox` factory may manage only:
+
+| Resource | Value |
 | --- | --- |
-| Pool | `cka-factory` |
-| Template VM ID | Configurable; the example uses `9000` |
-| Control plane | VM `110`, `cka-cp01`, 2 vCPU, 2 GiB RAM, 24 GiB disk |
-| Worker | VM `111`, `cka-worker01`, 1 vCPU, 2 GiB RAM, 24 GiB disk |
-| Bridge | `vmbr1` |
-| Datastore | `local-lvm` in the example |
+| Pool/tag | `cka-factory` |
+| Control plane | VM `320`, `cka-cp01`, 2 vCPU, 2 GiB RAM, 24 GiB disk |
+| Worker | VM `321`, `cka-worker01`, 1 vCPU, 2 GiB RAM, 24 GiB disk |
+| Reference bridge | `vmbr1` |
+| Reference datastore | `local-lvm` |
 | CNI | Flannel `v0.28.8` |
-| Kubernetes | `v1.37` in generated inventory |
+| Kubernetes | `v1.37` |
 | Workstation jump-host alias | `proxmox` |
 
-Destination VM IDs, pool, bridge, names, and tags are enforced in the current
-code. The template, datastore, Proxmox node, addresses, and guest admin username
-come from ignored local variables. Adapting enforced values is an infrastructure
-change and requires updating all safety checks together.
-
-## Required Proxmox preparation
-
-The repository does not create the base template, pool, API identity, ACLs, bridge, or routing. Prepare those before the first run.
-
-The cloud-init template must:
-
-- boot on the target Proxmox node;
-- have QEMU guest agent support;
-- accept an injected SSH public key;
-- provide the configured admin user with passwordless sudo;
-- reach package repositories and DNS from `vmbr1`.
-
-Create a scoped token named `cka-factory@pve!terraform`. It needs only the
-permissions required to clone the configured template, use the selected storage
-and bridge, read guest-agent output, and manage factory guests in pool
-`cka-factory`. Keep ACL setup operator-managed and review it against your
-Proxmox version.
+The template, datastore, Proxmox node, addresses, administrator name, and SSH
+public key are local inputs. IDs, names, pool, and tags are enforced together so
+teardown can fail closed.
 
 ## Local files
 
-Copy and edit:
+Initialize the dependency and create templates:
 
 ```bash
-cp infrastructure/proxmox/terraform.tfvars.example \
-  infrastructure/proxmox/terraform.tfvars
+git submodule update --init --recursive
+make requirements
 ```
 
-Create `.cka-factory/proxmox.env` with mode `0600`:
+The helper creates ignored files at:
 
 ```text
-TF_VAR_proxmox_api_token=cka-factory@pve!terraform=REPLACE_WITH_TOKEN_SECRET
+vendor/proxmox-lab/scenarios/cka-kubernetes-proxmox/terraform/terraform.tfvars
+.cka-factory/proxmox.env
 ```
 
-Both paths are ignored. The lifecycle script rejects a symlinked, non-owner, or incorrectly permissioned token file and parses only the expected assignment.
+The token file must be owned by the current user, must not be a symlink, must
+have mode `0600`, and must contain exactly one expected assignment. Never commit
+it, Terraform state, generated inventory, kubeconfig, or private SSH keys.
 
 ## Provisioning sequence
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Factory as lab-factory.sh
+    participant CKA as cka-lab adapter
+    participant Factory as proxmox-lab factory
     participant PVE as Proxmox VE
     participant Nodes as cka-cp01 + cka-worker01
-    User->>Factory: make lab-up
+    User->>CKA: make lab-up
+    CKA->>Factory: delegated lab-up
     Factory->>PVE: verify state and collision boundary
     Factory->>PVE: Terraform apply
-    Factory->>Nodes: pin guest SSH host keys
+    Factory->>Nodes: pin SSH host keys and wait for Cloud-Init
     Factory->>Nodes: Ansible kubeadm bootstrap
-    Factory->>Nodes: wait for nodes, Flannel, CoreDNS
-    Factory-->>User: kubeconfig + Ready nodes
+    Factory->>Nodes: require Ready nodes, Flannel, and CoreDNS
+    Factory-->>CKA: local kubeconfig
 ```
 
 ## Teardown guarantees
 
-`make lab-down` destroys only when:
+`make lab-down` proceeds only when:
 
 - Terraform state contains exactly the two expected VM resources;
-- state binds them to IDs `110` and `111` with the expected names and pool;
-- live Proxmox metadata has matching names, pool, and factory tag.
+- state binds them to IDs 320 and 321 with expected names and pool;
+- live Proxmox metadata has matching names, pool, and ownership tag.
 
-An empty state is not permission to delete matching IDs. If either ID exists untracked, teardown refuses to continue.
+An empty state is not permission to delete matching IDs. If either reserved ID
+exists untracked, the factory refuses to continue.
 
-## Current limits
+## Infrastructure changes
 
-- Linux/GNU userland is required by the lifecycle script.
-- Proxmox is the only infrastructure backend.
-- Template and ACL bootstrapping are manual.
-- The topology is one control-plane node and one worker, not HA.
-- No compatibility matrix beyond the current pinned versions has been tested.
+Change Terraform, Ansible, Cloud-Init, ownership checks, or teardown behavior in
+`proxmox-lab`, then update the pinned submodule commit here. Keep missions,
+trainer behavior, and learner state in `cka-lab`.

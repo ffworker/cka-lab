@@ -6,10 +6,11 @@
 
 [![Validate learning workspace](https://github.com/ffworker/cka-lab/actions/workflows/learning-validate.yml/badge.svg)](https://github.com/ffworker/cka-lab/actions/workflows/learning-validate.yml)
 
-CKA Lab is a practical-first Kubernetes training system. Terraform and Ansible
-build a disposable two-node kubeadm cluster on Proxmox; eight break/fix missions
-inject faults, validate the live Kubernetes API, and award local XP. An optional
-AI tutor, Pod-Professor, coaches without revealing the answer immediately.
+CKA Lab is a practical-first Kubernetes training system. The pinned
+[`proxmox-lab`](https://github.com/ffworker/proxmox-lab) infrastructure companion
+builds a disposable two-node kubeadm cluster; eight break/fix missions inject
+faults, validate the live Kubernetes API, and award local XP. An optional AI
+tutor, Pod-Professor, coaches without revealing the answer immediately.
 
 **Kubernetes · Proxmox · Terraform · Ansible · kubeadm · Python · Bash**
 
@@ -20,16 +21,14 @@ AI tutor, Pod-Professor, coaches without revealing the answer immediately.
 ## Quick start
 
 First complete the [Proxmox setup guide](docs/QUICKSTART.md), including the
-cloud-init template, isolated bridge, scoped API token, and ignored local input
-files. Then:
+Cloud-Init template, isolated bridge, scoped API token, pinned infrastructure
+submodule, and ignored local input files. Then:
 
 ```bash
-git clone https://github.com/ffworker/cka-lab.git
+git clone --recurse-submodules https://github.com/ffworker/cka-lab.git
 cd cka-lab
-cp infrastructure/proxmox/terraform.tfvars.example \
-  infrastructure/proxmox/terraform.tfvars
-
-# Configure the documented Proxmox inputs and local token file first.
+make requirements
+# Configure the generated local Proxmox inputs and token file first.
 make lab-up
 make mission
 make validate
@@ -68,7 +67,7 @@ flowchart LR
 
 | Engineering decision | Implementation |
 | --- | --- |
-| Disposable infrastructure | Terraform owns exactly two factory guests; rebuild and teardown are normal operations. |
+| Disposable infrastructure | The pinned proxmox-lab scenario owns exactly two factory guests; rebuild and teardown are normal operations. |
 | Clear automation boundaries | Terraform owns VM lifecycle. Ansible owns containerd, kubeadm, Flannel, and node configuration. |
 | Validation over checklists | Missions pass only when validators observe the required state through Kubernetes. |
 | State discipline | The neutral tracked default is the fallback; an ignored `.cka-factory/learner-state.json` drives personalized eligibility when present, while progress stays local. |
@@ -109,7 +108,7 @@ two progressive hints, and an explicit solution. Browse the
 
 ## Project status
 
-- **Working:** two-node Proxmox factory, kubeadm bootstrap, Flannel, eight
+- **Working:** delegated two-node Proxmox factory, kubeadm bootstrap, Flannel, eight
   missions, live validators, local progression, and the Pod-Professor adapter.
 - **Environment-bound:** public installation requires adapting documented local
   inputs around the intentionally fixed safety boundaries.
@@ -129,6 +128,7 @@ compatibility matrix has been tested.
 - [Training model](docs/TRAINING-MODEL.md)
 - [Gamification](docs/GAMIFICATION.md)
 - [Pod-Professor](docs/POD-PROFESSOR.md)
+- [kubectl field reference](docs/REFERENCE.md)
 - [Contributing](CONTRIBUTING.md) and [security reporting](SECURITY.md)
 
 ## Requirements
@@ -143,7 +143,7 @@ make requirements
 make requirements-check
 ```
 
-The installer creates `infrastructure/proxmox/terraform.tfvars` and
+The installer creates the proxmox-lab scenario's ignored `terraform.tfvars` and
 `.cka-factory/proxmox.env` when they do not exist. Edit both files with your
 local Proxmox values and token before running `make lab-up`.
 
@@ -154,8 +154,11 @@ and exits without guessing at a third-party source. Hermes Agent `>=0.21.0` is
 optional and only needed for Pod-Professor; install it separately before the
 `hermes profile install` command in the [quick start](docs/QUICKSTART.md).
 
-You still need an operator-managed Proxmox VE lab. The helper does not create
-the cloud-init template, isolated bridge, pool, API token, or SSH credentials.
+You still need an operator-managed Proxmox VE foundation. The helper does not
+create the Cloud-Init template, isolated bridge, pool, API token, or SSH
+credentials. Infrastructure changes belong in
+[`proxmox-lab`](https://github.com/ffworker/proxmox-lab); training changes belong
+here.
 
 ## License
 

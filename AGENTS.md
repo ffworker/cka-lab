@@ -1,64 +1,45 @@
 # AGENTS.md
 
-## Role
+## Purpose
 
-This repository is the complete CKA learning system. `qa/` owns theory and
-recall; practical training lives under `labs/`, `exercises/`, `scenarios/`, and
-`trainer/`; automation lives under `infrastructure/`, `ansible/`,
-`environments/`, and `scripts/`.
+CKA Lab is a practical-first CKA training system. Preserve the working trainer,
+mission pack, Pod-Professor behavior, and fail-closed Proxmox factory.
 
-Priorities:
-1. hands-on repetition
-2. troubleshooting flow
-3. kubectl speed
-4. manifest accuracy
-5. feedback back into theory
+## Read before changing behavior
 
-## Allowed work
+- `README.md`
+- `docs/ARCHITECTURE.md`
+- `docs/TRAINING-MODEL.md`
+- `.cka-factory/learner-state.json` when it exists
+- `trainer/config/learner-state.default.json` for the generic contract
 
-- create lab manifests
-- run practical exercises
-- inspect objects
-- write practical findings to ignored `.cka-factory/learner-state.json`
+Individual weak topics, readiness, observations, XP, mission history,
+credentials, and active mission state belong under ignored `.cka-factory/`.
 
-## System awareness
+## Ownership boundaries
 
-This is one self-contained repository. There is no operational dependency on
-an external `cka-qa` repository, `cka-shared` repository, or submodule.
+Theory or tutoring work may update `theoryStatus`, `practicalFocus`, and
+`lastUpdated`. Practical work may update `practicalFeedback` and `lastUpdated`.
+Do not silently overwrite the other side's fields.
 
-Before proposing or building practical work, read
-`.cka-factory/learner-state.json` when it exists; otherwise use the neutral
-`trainer/config/learner-state.default.json`. Respect:
-- `weakTopics`
-- `improvingTopics`
-- `stableTopics` (still eligible for spaced revision)
-- `unstableConcepts`
-- `recommendedDrills`
-- `readyForPractice`
-- `notYetIntroduced`
-- `practicalFeedback`
+Do not introduce missions for topics in `notYetIntroduced`. Stable topics remain
+eligible for revision. Executable practice belongs in `scenarios/`; reusable
+explanation belongs in `docs/`.
 
-## Ownership rules
+## Infrastructure safety
 
-Personal learner state may update:
-- `practicalFeedback`
-- `lastUpdated`
+Infrastructure work is limited to the two factory guests defined and verified
+by `scripts/lab-factory.sh`. `lab-down` must continue to fail closed unless
+local Terraform state and live Proxmox metadata agree exactly.
 
-Practical work must not overwrite these learner-owned fields:
-- `theoryStatus`
-- `practicalFocus`
+Pod-Professor owns the learner experience. It may use Make targets and
+kubectl-visible training state, but it does not inventory or repair Proxmox.
 
-## Avoid
+## Change discipline
 
-- introducing theory topics not yet covered
-- committing personal learner state or findings
-- bypassing the learner-state contract
-
-## Lab rule
-
-Every exercise should map back to one of:
-- weak topics
-- improving topics
-- stable topics selected for revision
-- unstable concepts
-- recommended practical drills
+- Keep runtime state and credentials untracked.
+- Do not add a second trainer, progression system, or practical workflow.
+- Keep public claims limited to behavior verified in this repository.
+- Run trainer tests, scenario validation, shell syntax, and relevant
+  infrastructure checks after changes.
+- Do not commit, push, or rewrite history unless the user explicitly asks.

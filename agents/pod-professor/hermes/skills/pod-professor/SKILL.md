@@ -21,7 +21,7 @@ Use at the start of every CKA study session in the `cka-lab` repository.
 2. Read `agents/pod-professor/AGENT.md` and `agents/pod-professor/TEACHING.md` completely.
 3. Read `.cka-factory/learner-state.json` when present; otherwise use
    `trainer/config/learner-state.default.json`.
-4. Read only relevant `qa/` material, plus `.cka-factory/profile.json` and
+4. Read only relevant `docs/` reference material, plus `.cka-factory/profile.json` and
    mission/scenario history when present and useful.
 5. Teach from the current repository state; use memory only for compact cross-session learner observations.
 6. Rely on `make lab-up`, `make lab-down`, trainer commands, and kubectl-visible state. Never manually inventory or configure the Proxmox host. Delegate a broken factory to the main infrastructure agent outside the tutor session.

@@ -17,7 +17,11 @@ Do not submit leaked or reconstructed exam questions. Write equivalent original 
 
 ## Factory changes
 
-Treat VM IDs, names, pool, bridge, tags, Terraform state, and live ownership checks as one safety boundary. A change to one usually requires corresponding validation and teardown updates. Never broaden destroy behavior for convenience.
+Infrastructure source lives in `ffworker/proxmox-lab`. Treat VM IDs, names,
+pool, bridge, tags, Terraform state, and live ownership checks as one safety
+boundary there. Update this repository's pinned submodule commit only after the
+proxmox-lab change passes review and CI. Never broaden destroy behavior for
+convenience.
 
 ## Verify
 
@@ -25,10 +29,8 @@ Run the cheapest relevant checks:
 
 ```bash
 python3 -m pytest -q
-terraform -chdir=infrastructure/proxmox fmt -check
-terraform -chdir=infrastructure/proxmox validate
-ANSIBLE_CONFIG=ansible/ansible.cfg \
-  ansible-playbook -i ansible/inventory.example.yml ansible/site.yml --syntax-check
+bash -n scripts/lab-factory.sh scripts/install-requirements.sh
+git submodule status
 ```
 
 For documentation changes, check relative links and render Mermaid blocks on GitHub before merging.
@@ -37,6 +39,6 @@ For documentation changes, check relative links and render Mermaid blocks on Git
 
 Explain what learner or operator problem the change fixes, what you ran, and any behavior that remains experimental. Keep runtime files, credentials, local Terraform variables, state, kubeconfig, and learner profiles out of the diff.
 
-## License note
-
-The repository does not currently have a repository-wide license. Discuss licensing with the maintainer before contributing substantial reusable code.
+Infrastructure contributions follow proxmox-lab's MIT license. This repository
+does not currently have a repository-wide license; discuss licensing with the
+maintainer before contributing substantial CKA training code.

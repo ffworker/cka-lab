@@ -1,6 +1,8 @@
 # Architecture
 
-CKA Lab keeps the learner loop, learning state, and disposable infrastructure in one repository while giving each part a narrow owner.
+CKA Lab owns the learner loop and learning state. Disposable infrastructure is
+delegated to the pinned public `ffworker/proxmox-lab` repository so each domain
+has one narrow owner.
 
 ```mermaid
 flowchart LR
@@ -38,9 +40,13 @@ Each directory under `scenarios/` has metadata plus four artifacts: injector, va
 
 `agents/pod-professor/` contains provider-neutral teaching behavior and the current Hermes profile adapter. It calls the trainer and interprets learner output. It does not own Proxmox configuration.
 
-### Factory
+### Factory dependency
 
-Terraform creates the two fixed guests. Ansible installs containerd and Kubernetes, initializes the control plane, installs Flannel, joins the worker, and copies kubeconfig back to the workstation.
+`scripts/lab-factory.sh` delegates to
+`vendor/proxmox-lab/scenarios/cka-kubernetes-proxmox/`. Terraform creates the
+two fixed guests. Ansible installs containerd and Kubernetes, initializes the
+control plane, installs Flannel, joins the worker, and copies kubeconfig back to
+the CKA runtime directory.
 
 ```mermaid
 flowchart TB
@@ -60,7 +66,7 @@ Tracked:
 - scenario definitions and validators;
 - generic learner-state default and schema;
 - trainer schemas and game catalogues;
-- Terraform and Ansible source.
+- the pinned proxmox-lab submodule commit and a narrow factory adapter.
 
 Ignored and local:
 
@@ -73,4 +79,9 @@ Ignored and local:
 
 ## Safety model
 
-The factory is intentionally narrow. Terraform may manage only VM IDs `110` and `111` in pool `cka-factory`, with matching names and ownership tags. `lab-down` verifies both local state and live metadata before destroying anything. Scenario reset scripts delete only their owned training namespace; the node-scoped taint scenario checks and removes only its exact owned taint.
+The factory is intentionally narrow. The delegated proxmox-lab scenario may
+manage only VM IDs `320` and `321` in pool `cka-factory`, with matching names
+and ownership tags. `lab-down` verifies both local state and live metadata
+before destroying anything. Scenario reset scripts delete only their owned
+training namespace; the node-scoped taint scenario checks and removes only its
+exact owned taint.

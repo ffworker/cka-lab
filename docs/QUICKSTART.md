@@ -1,138 +1,128 @@
 # Quick start
 
-CKA Lab's current backend provisions two kubeadm nodes on Proxmox VE. The setup is deliberately opinionated and requires local configuration before the first run.
+CKA Lab uses the dedicated CKA scenario from
+[`ffworker/proxmox-lab`](https://github.com/ffworker/proxmox-lab) for
+infrastructure lifecycle. This repository owns training and learner state; the
+pinned submodule owns Terraform, Cloud-Init, Ansible, and guarded teardown.
 
-## 1. Check the prerequisites
+## 1. Prepare Proxmox
 
-The bundled installer in step 2 installs the local tools below through the
-detected `apt-get`, `dnf`, `pacman`, or `zypper` package manager. If your
-distribution does not package Terraform or kubectl, it prints the official
-installation page for the missing command.
+The scenario requires an operator-managed foundation:
 
-The Linux workstation needs:
+- a Debian Cloud-Init template with SSH and QEMU Guest Agent support;
+- VM storage;
+- an isolated bridge with outbound routing and DNS;
+- pool `cka-factory`;
+- unused VM IDs 320 and 321;
+- a scoped Proxmox API token;
+- an SSH alias named `proxmox` that reaches the host non-interactively;
+- capacity for about 3 vCPU, 4 GiB RAM, and two 24 GiB virtual disks.
 
-- Bash, Python 3, GNU Make, and OpenSSH
-- Terraform
-- Ansible
-- kubectl
-- Git
-- Hermes Agent `>=0.21.0` only if you want Pod-Professor
+Read the [factory guide](PROXMOX-FACTORY.md) before changing enforced IDs,
+names, pool, tags, or teardown checks.
 
-On Proxmox, prepare:
-
-- a cloud-init Linux template with the QEMU guest agent and SSH server (the example uses VM ID `9000`);
-- storage available to the factory (the example uses `local-lvm`);
-- an isolated bridge named `vmbr1` with outbound routing and DNS reachability;
-- a pool named `cka-factory`;
-- unused VM IDs `110` and `111`;
-- a scoped token named `cka-factory@pve!terraform`;
-- enough free capacity for roughly 3 vCPU, 4 GiB RAM, and two 24 GiB virtual disks.
-
-The factory currently expects an SSH host alias named `proxmox`. Configure it in `~/.ssh/config` so `ssh proxmox` reaches the Proxmox host without interactive authentication.
-
-The guest names, pool, bridge, and destination VM IDs are safety boundaries in
-the current implementation, not generic defaults. Template ID, datastore, node
-name, addresses, and admin username are local inputs. Read
-[the factory guide](PROXMOX-FACTORY.md) before changing enforced values.
-
-## 2. Clone and configure
+## 2. Clone both repositories
 
 ```bash
-git clone https://github.com/ffworker/cka-lab.git
+git clone --recurse-submodules https://github.com/ffworker/cka-lab.git
 cd cka-lab
 make requirements
 make requirements-check
 ```
 
-The installer creates the ignored `terraform.tfvars` and `.cka-factory/proxmox.env`
-templates. Edit the `terraform.tfvars` file. Review the endpoint, Proxmox node,
-template, datastore, and guest username, then replace every placeholder with
-values from your isolated lab network and the public SSH key that should be
-installed in the guests. The example deliberately contains no working address
-or key.
-
-Create the ignored runtime directory and token file:
+If the repository was cloned without submodules:
 
 ```bash
-mkdir -p .cka-factory
-chmod 700 .cka-factory
-install -m 600 /dev/null .cka-factory/proxmox.env
-$EDITOR .cka-factory/proxmox.env
-chmod 600 .cka-factory/proxmox.env
+git submodule update --init --recursive
 ```
 
-Add exactly one line in the editor:
+For side-by-side development, use an absolute local checkout instead:
+
+```bash
+export PROXMOX_LAB_ROOT=/absolute/path/to/proxmox-lab
+```
+
+## 3. Configure local inputs
+
+`make requirements` creates ignored templates at:
+
+```text
+vendor/proxmox-lab/scenarios/cka-kubernetes-proxmox/terraform/terraform.tfvars
+.cka-factory/proxmox.env
+```
+
+When `PROXMOX_LAB_ROOT` is set, the Terraform file is created under that
+checkout instead of the submodule.
+
+Edit `terraform.tfvars` and replace every placeholder with your endpoint, node,
+template, datastore, bridge, gateway, DNS, guest addresses, administrator name,
+and SSH public key.
+
+The token file must have mode `0600` and exactly one assignment:
 
 ```text
 TF_VAR_proxmox_api_token=cka-factory@pve!terraform=REPLACE_WITH_TOKEN_SECRET
 ```
 
-Replace only `REPLACE_WITH_TOKEN_SECRET`. Do not put this value in Terraform
+Replace only the placeholder secret. Do not put the value in Terraform
 variables, shell history, issues, or commits.
 
-The token needs enough scoped Proxmox permissions to clone the configured
-template, use the configured storage and `vmbr1`, read guest-agent data, and
-manage guests in the `cka-factory` pool. Token and ACL creation are currently
-operator-managed; the repository does not automate them.
-
-To keep individual study state local, optionally create a personal copy of the
-neutral curriculum baseline:
+To keep individual study state local, optionally create:
 
 ```bash
 cp trainer/config/learner-state.default.json \
   .cka-factory/learner-state.json
 ```
 
-The trainer prefers this ignored local file when it exists and otherwise uses
-the tracked neutral default.
-
-## 3. Provision the cluster
+## 4. Provision
 
 ```bash
 make lab-up
 make status
 ```
 
-`lab-up` initializes Terraform, verifies its ownership boundary, creates or reconciles the two VMs, runs Ansible, opens a local API tunnel, and waits for both Kubernetes nodes, Flannel, and CoreDNS.
+The adapter delegates to proxmox-lab. The factory initializes Terraform, rejects
+untracked collisions, creates exactly two VMs, records trusted SSH host keys,
+waits for Cloud-Init, runs Ansible, opens a local API tunnel, and requires both
+nodes, Flannel, and CoreDNS to become ready.
 
-The generated kubeconfig is `.cka-factory/kubeconfig`. To work directly:
+The generated kubeconfig is `.cka-factory/kubeconfig`:
 
 ```bash
 export KUBECONFIG="$PWD/.cka-factory/kubeconfig"
 kubectl get nodes -o wide
 ```
 
-## 4. Start training
-
-Without an AI tutor:
+## 5. Train
 
 ```bash
 make mission
-# Work in another terminal with kubectl or YAML.
 make validate
-make hint       # only when wanted
-make solution   # explicit spoiler
+make hint
+make solution
 make reset
 make profile
 ```
 
-With Pod-Professor:
+Optional tutor:
 
 ```bash
 hermes profile install ./agents/pod-professor/hermes --alias
 pod-professor chat
 ```
 
-Then say `Start a mission`.
-
-## 5. Tear down safely
+## 6. Tear down
 
 ```bash
 make lab-down
 ```
 
-Teardown proceeds only when Terraform state and live Proxmox metadata identify exactly the two factory VMs. It refuses partial, extra, untracked, or mismatched state.
+Teardown proceeds only when Terraform state and live Proxmox metadata agree on
+exactly VM 320 `cka-cp01` and VM 321 `cka-worker01` with the expected pool and
+tag. Partial, extra, untracked, or mismatched state fails closed.
 
 ## Troubleshooting boundary
 
-Pod-Professor owns the learner experience, not Proxmox repair. If `make lab-up` itself fails, leave the tutor session and diagnose the factory with an infrastructure-capable agent or operator. Do not broaden Pod-Professor's access to the host.
+Pod-Professor owns the learner experience, not Proxmox repair. If `make lab-up`
+fails, diagnose the factory in `proxmox-lab` with an infrastructure-capable
+operator or agent. Do not broaden the tutor's host access.

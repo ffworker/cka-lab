@@ -155,13 +155,32 @@ if [[ "$MODE" == install ]]; then
 
     repo_root=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
     runtime_dir="$repo_root/.cka-factory"
-    tfvars="$repo_root/infrastructure/proxmox/terraform.tfvars"
+    if [[ -n "${PROXMOX_LAB_ROOT:-}" ]]; then
+        [[ "$PROXMOX_LAB_ROOT" == /* ]] || {
+            printf 'cka-lab requirements: PROXMOX_LAB_ROOT must be an absolute path\n' >&2
+            exit 1
+        }
+        proxmox_root=$PROXMOX_LAB_ROOT
+    else
+        proxmox_root="$repo_root/vendor/proxmox-lab"
+    fi
+    scenario_root="$proxmox_root/scenarios/cka-kubernetes-proxmox"
+    tfvars="$scenario_root/terraform/terraform.tfvars"
+    tfvars_example="$scenario_root/terraform/terraform.tfvars.example"
     env_file="$runtime_dir/proxmox.env"
+
+    if [[ ! -f "$tfvars_example" ]]; then
+        printf 'cka-lab requirements: pinned proxmox-lab scenario is unavailable at %s\n' "$scenario_root" >&2
+        printf 'Run: git submodule update --init --recursive\n' >&2
+        printf 'Or set PROXMOX_LAB_ROOT to an absolute proxmox-lab checkout path.\n' >&2
+        exit 1
+    fi
+
     mkdir -p "$runtime_dir"
     chmod 700 "$runtime_dir"
 
     if [[ ! -e "$tfvars" ]]; then
-        cp "$repo_root/infrastructure/proxmox/terraform.tfvars.example" "$tfvars"
+        cp "$tfvars_example" "$tfvars"
         printf 'Created local Terraform configuration: %s\n' "$tfvars"
     fi
     chmod 600 "$tfvars"
@@ -171,5 +190,5 @@ if [[ "$MODE" == install ]]; then
         printf 'Created secure token template: %s\n' "$env_file"
     fi
     printf '\ncka-lab requirements: all workstation commands are ready\n'
-    printf 'Next: edit infrastructure/proxmox/terraform.tfvars and .cka-factory/proxmox.env, then run make lab-up.\n'
+    printf 'Next: edit %s and %s, then run make lab-up.\n' "$tfvars" "$env_file"
 fi

@@ -392,19 +392,53 @@ def test_taint_mission_only_removes_its_exact_owned_taint():
     assert 'eq .value "dedicated"' in validator
 
 
-def test_factory_uses_configured_admin_username():
-    script = (REPO / "scripts/lab-factory.sh").read_text()
-    outputs = (REPO / "infrastructure/proxmox/outputs.tf").read_text()
-    variables = (REPO / "infrastructure/proxmox/variables.tf").read_text()
-    example = (REPO / "infrastructure/proxmox/terraform.tfvars.example").read_text()
-    private_host = "pve" + "01"
+def test_factory_delegates_to_pinned_proxmox_scenario(tmp_path):
+    adapter = REPO / "scripts/lab-factory.sh"
+    proxmox_root = tmp_path / "proxmox-lab"
+    delegated = (
+        proxmox_root
+        / "scenarios/cka-kubernetes-proxmox/scripts/lab-factory.sh"
+    )
+    delegated.parent.mkdir(parents=True)
+    delegated.write_text(
+        '#!/bin/sh\nprintf "%s\\n" "$1" "$2" >"$CAPTURE"\n',
+        encoding="utf-8",
+    )
+    delegated.chmod(0o755)
+    runtime = tmp_path / "runtime"
+    capture = tmp_path / "delegated-arguments"
 
-    assert 'terraform -chdir="$TF_DIR" output -raw admin_username' in script
-    assert '"${admin_username}@$ip"' in script
-    assert "output \"admin_username\"" in outputs
-    assert "admin_username must be a valid Linux account name" in variables
-    assert private_host not in variables
-    assert private_host not in example
+    result = subprocess.run(
+        [adapter, "lab-up", runtime],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+        check=False,
+        env={
+            **os.environ,
+            "PROXMOX_LAB_ROOT": str(proxmox_root),
+            "CAPTURE": str(capture),
+        },
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert capture.read_text().splitlines() == ["lab-up", str(runtime)]
+    script = adapter.read_text()
+    assert "scenarios/cka-kubernetes-proxmox/scripts/lab-factory.sh" in script
+    assert "infrastructure/proxmox" not in script
+
+
+def test_factory_rejects_relative_proxmox_override(tmp_path):
+    result = subprocess.run(
+        [REPO / "scripts/lab-factory.sh", "lab-down", tmp_path / "runtime"],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+        check=False,
+        env={**os.environ, "PROXMOX_LAB_ROOT": "../proxmox-lab"},
+    )
+    assert result.returncode == 1
+    assert "must be an absolute path" in result.stderr
 
 
 def test_existing_profile_is_validated(tmp_path):

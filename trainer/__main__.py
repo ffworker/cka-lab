@@ -11,6 +11,7 @@ from pathlib import Path
 from .core import (
     SELECTION_MODES,
     complete_mission,
+    default_profile,
     discover_scenarios,
     load_catalogue,
     load_or_create_profile,
@@ -81,8 +82,8 @@ def _difficulty(value: str) -> str:
     return "★" * filled + "☆" * (5 - filled)
 
 
-def _show_mission(scenario: dict, *, resumed: bool = False) -> None:
-    _rule("INCIDENT // RESUME" if resumed else "INCIDENT // ACTIVE")
+def _show_mission(scenario: dict, *, resumed: bool = False, preview: bool = False) -> None:
+    _rule("INCIDENT // PREVIEW" if preview else "INCIDENT // RESUME" if resumed else "INCIDENT // ACTIVE")
     print(f"\n{scenario['title']}")
     if scenario.get("codename") and scenario["codename"] != scenario["title"]:
         print(f"Codename     {scenario['codename']}")
@@ -95,7 +96,7 @@ def _show_mission(scenario: dict, *, resumed: bool = False) -> None:
     print("\nSUCCESS\n\nSuccess criteria:")
     for criterion in scenario["successCriteria"]:
         print(f"✓ {criterion}")
-    print("\nTimer continues." if resumed else "\nTimer started.")
+    print("\nPreview only: no VM, Kubernetes changes or timer." if preview else "\nTimer continues." if resumed else "\nTimer started.")
 
 
 def _show_profile(profile: dict, ranks: list[dict], achievements: list[dict], scenarios: list[dict]) -> None:
@@ -131,7 +132,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="cka-trainer")
     parser.add_argument("--runtime-dir", type=Path, default=REPO / ".cka-factory")
     subparsers = parser.add_subparsers(dest="command", required=True)
-    for command in ("status", "validate", "hint", "solution", "reset", "lab-up", "lab-down"):
+    for command in ("status", "preview", "validate", "hint", "solution", "reset", "lab-up", "lab-down"):
         subparsers.add_parser(command)
     profile = subparsers.add_parser("profile")
     profile.add_argument("--json", action="store_true", dest="as_json")
@@ -142,7 +143,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = build_parser().parse_args()
-    profile = load_or_create_profile(args.runtime_dir)
+    # Preview must not initialize runtime state just to read the next assignment.
+    profile = (
+        default_profile()
+        if args.command == "preview" and not (args.runtime_dir / "profile.json").exists()
+        else load_or_create_profile(args.runtime_dir)
+    )
     study_path = args.runtime_dir / "learner-state.json"
     if not study_path.is_file():
         study_path = REPO / "trainer/config/learner-state.default.json"
@@ -184,7 +190,7 @@ def main() -> int:
             active = json.loads(active_path.read_text(encoding="utf-8"))
             active_name = _scenario_by_id(scenarios, active["scenarioId"])["title"]
         next_action = "make mission  # resume active mission" if active_name != "none" else (
-            "make mission" if cluster_status == "READY" else "make lab-up"
+            "make preview  # no infrastructure changes"
         )
         _rule("CKA LAB // MISSION CONTROL")
         print(f"\nCluster      {cluster_status}")
@@ -195,6 +201,21 @@ def main() -> int:
         print(f"Scenarios    {len(scenarios)}")
         print(f"Study state  weak: {len(study['weakTopics'])} | ready: {len(study['readyForPractice'])}")
         print(f"Next         {next_action}")
+    elif args.command == "preview":
+        # Strictly local, read-only orientation: inspect state and choose a
+        # scenario; never run its injector, reset scripts, kubectl, or factory.
+        active_path = args.runtime_dir / "active-mission.json"
+        if active_path.is_file():
+            active = json.loads(active_path.read_text(encoding="utf-8"))
+            scenario = _scenario_by_id(scenarios, active["scenarioId"])
+            _show_mission(scenario, preview=True)
+            print("Current active mission shown without modifying it.")
+        elif scenarios:
+            study = load_study_state(study_path)
+            scenario = select_scenario(scenarios, study, profile, "mixed")
+            _show_mission(scenario, preview=True)
+        else:
+            print("No practice scenarios yet. Review docs/ and return when ready.")
     elif args.command == "profile":
         if args.as_json:
             print(json.dumps(profile, indent=2))

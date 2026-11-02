@@ -462,9 +462,40 @@ def test_make_mode_cannot_inject_shell_commands(tmp_path):
         assert not marker.exists()
 
 
+def test_preview_reads_catalogue_without_creating_runtime_or_touching_cluster(tmp_path):
+    runtime = tmp_path / "fresh-no-runtime"
+    result = subprocess.run(
+        [sys.executable, "-m", "trainer", "--runtime-dir", str(runtime), "preview"],
+        cwd=REPO, text=True, capture_output=True, check=False,
+        # Explicitly *not* setting CKA_FACTORY_DRY_RUN: preview itself is safe.
+        env={**os.environ, "CKA_FACTORY_DRY_RUN": "0"},
+    )
+    assert result.returncode == 0, result.stderr
+    assert "INCIDENT // PREVIEW" in result.stdout
+    assert "no VM, Kubernetes changes or timer" in result.stdout
+    assert not runtime.exists(), "preview must not initialize learner state"
+
+
+def test_preview_of_existing_mission_does_not_reset_or_inject(tmp_path):
+    runtime = tmp_path / "existing-runtime"
+    runtime.mkdir()
+    active = {"scenarioId": "service-endpoints", "completed": True, "hintCount": 2}
+    before = json.dumps(active)
+    (runtime / "active-mission.json").write_text(before)
+    result = subprocess.run(
+        [sys.executable, "-m", "trainer", "--runtime-dir", str(runtime), "preview"],
+        cwd=REPO, text=True, capture_output=True, check=False,
+        env={**os.environ, "CKA_FACTORY_DRY_RUN": "0"},
+    )
+    assert result.returncode == 0, result.stderr
+    assert "service" in result.stdout.lower()
+    assert (runtime / "active-mission.json").read_text() == before
+    assert not (runtime / "profile.json").exists()
+
+
 @pytest.mark.parametrize(
     "command",
-    ["status", "mission", "validate", "hint", "solution", "reset", "profile", "lab-up", "lab-down"],
+    ["status", "preview", "mission", "validate", "hint", "solution", "reset", "profile", "lab-up", "lab-down"],
 )
 def test_trainer_commands_respond_without_live_changes(command, tmp_path):
     result = subprocess.run(

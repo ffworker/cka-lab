@@ -1,5 +1,7 @@
 # CKA Lab
 
+> **Learning-first reset (November 2026):** The original goal was to pass CKA, not build the most elaborate VM factory. Eight missions, a tutor and infrastructure automation already exist, but they have **not** been verified through repeated personal learning sessions. Start with a read-only preview, then validate one disposable live mission before expanding anything. See [the scope reset](docs/LEARNING-FIRST-RESET.md) and the [standalone Linear project](https://linear.app/bytegeist/project/cka-lab-learning-first-3c7cc473970e).
+
 > **Break Kubernetes on purpose.**<br>
 > **Fix it under pressure.**<br>
 > Level up until the exam feels boring.
@@ -20,7 +22,17 @@ tutor, Pod-Professor, coaches without revealing the answer immediately.
 
 ## Quick start
 
-First complete the [Proxmox setup guide](docs/QUICKSTART.md), including the
+**Try this first without touching Proxmox or Kubernetes:**
+
+```bash
+git clone --recurse-submodules https://github.com/ffworker/cka-lab.git
+cd cka-lab
+make preview
+```
+
+This only prints one proposed mission and its success criteria. It does not inject a fault, run kubectl or start a VM. **Do not run `make lab-up` until you have reviewed the isolated disposable target.**
+
+For a real lab session, complete the [Proxmox setup guide](docs/QUICKSTART.md), including the
 Cloud-Init template, isolated bridge, scoped API token, pinned infrastructure
 submodule, and ignored local input files. Then:
 
@@ -96,7 +108,8 @@ two progressive hints, and an explicit solution. Browse the
 
 | Command | Result |
 | --- | --- |
-| `make lab-up` | Provision or reconcile the lab and wait for both nodes to become Ready. |
+| `make preview` | Show the next mission locally without provisioning, injecting or writing learner state. |
+| `make lab-up` | Explicitly provision the disposable two-node lab after safety review. |
 | `make status` | Show factory, cluster, scenario, and local study state. |
 | `make mission` | Select and inject a mission, then start its timer. |
 | `make validate` | Check live state and record an attempt. |
@@ -108,12 +121,13 @@ two progressive hints, and an explicit solution. Browse the
 
 ## Project status
 
-- **Working:** delegated two-node Proxmox factory, kubeadm bootstrap, Flannel, eight
-  missions, live validators, local progression, and the Pod-Professor adapter.
+- **Implemented:** delegated Proxmox factory, kubeadm bootstrap, Flannel, eight
+  missions, validator code, local progression, and Pod-Professor adapter.
+  **A personal end-to-end live learning run is not yet demonstrated.**
 - **Environment-bound:** public installation requires adapting documented local
   inputs around the intentionally fixed safety boundaries.
-- **Study mode:** feature development is frozen unless something is broken. The
-  project is returning to active CKA practice, not another architecture cycle.
+- **Learning-first mode:** no new platform features until an isolated live mission
+  has been attempted, repaired, validated and reset by the learner.
 - **Scope:** original exam-style practice only—no leaked or proprietary exam
   questions.
 

@@ -1,7 +1,7 @@
 PYTHON ?= python3
 TRAINER := $(PYTHON) -m trainer
 
-.PHONY: requirements requirements-check status lab-up mission validate hint solution reset lab-down profile
+.PHONY: requirements requirements-check status preview lab-up mission validate hint solution reset lab-down profile
 
 requirements:
 	@./scripts/install-requirements.sh --install
@@ -11,6 +11,9 @@ requirements-check:
 
 status:
 	@$(TRAINER) status
+
+preview:
+	@$(TRAINER) preview
 
 lab-up:
 	@$(TRAINER) lab-up
